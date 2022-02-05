@@ -56,3 +56,15 @@ class TestFindWord(DictionaryTestBase):
                           'hefta']
         words = self.dictionary._do_match_word(list('.....'), '', list('e....'))
         self.assertEqual(expected_words, words, "Find with one mandatory letters fail")
+
+    def test_two_mandatory_letters(self):
+        # There is a letter 'e' in the word. We know it is not the first, mask is empty.
+        # There is a letter 'n' in the word. We know it is not the third, mask is empty.
+        expected_words = ['aamen', 'ahven']
+        words = self.dictionary._do_match_word(list('.....'), '', list('e.n..'))
+        self.assertEqual(expected_words, words, "Find with two mandatory letters fail")
+
+    def test_one_mask_and_one_mandatory_letter(self):
+        expected_words = ['ahven']
+        words = self.dictionary._do_match_word(list('.h...'), '', list('e.n..'))
+        self.assertEqual(expected_words, words, "Find with one mask and one mandatory letters fail")
