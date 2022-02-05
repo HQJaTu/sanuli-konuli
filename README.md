@@ -135,3 +135,36 @@ find-matching-word.py words/kotus-sanalista_v1.dat "hau.a" "lkoimt" "....."
 **Attempt**: _HAUVA_
 
 **Result**: WIN!
+
+# Installation
+Copy CLI-utils and libraries into currently active venv or system if not using virtual environment.
+```bash
+git clone https://github.com/HQJaTu/sanuli-konuli.git
+cd sanuli-konuli
+pip install .
+```
+
+# Development
+
+## Running local dev
+
+### One-time venv creation
+Recommended virtual environment creation. Using directory `venv`:
+```bash
+python -m virtualenv venv
+. venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Activate venv before using
+Activate:
+```bash
+. venv/bin/activate
+```
+
+## Running tests
+
+In directory `sanuli-konuli` point to test-directory `tests/`.
+```bash
+python -m unittest discover -s tests -t .
+```

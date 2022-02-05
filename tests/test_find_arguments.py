@@ -1,4 +1,4 @@
-from testsetup import DictionaryTestBase
+from .testsetup import DictionaryTestBase
 
 
 class TestFindArguments(DictionaryTestBase):
