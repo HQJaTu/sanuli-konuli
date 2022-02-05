@@ -44,20 +44,20 @@ class TestFindWord(DictionaryTestBase):
 
     def test_one_mandatory_letter(self):
         # There is a letter 'e' in the word. We know it is not the first, mask is empty.
-        expected_words = ['aamen',
+        expected_words = [#'aamen',
                           'ahven',
-                          'ameba',
-                          'asema',
+                          #'ameba',
+                          #'asema',
                           'asemo',
-                          'asete',
-                          'aueta',
-                          'bebee',
-                          'beeta',
+                          #'asete',
+                          #'aueta',
+                          #'bebee',
+                          #'beeta',
                           'bensa',
                           'bänet',
-                          'debet',
-                          'genre',
-                          'getto',
+                          #'debet',
+                          #'genre',
+                          #'getto',
                           'heavy',
                           'hefta']
         words = self.dictionary._do_match_word(list('.....'), '', list('e....'))
@@ -66,7 +66,9 @@ class TestFindWord(DictionaryTestBase):
     def test_two_mandatory_letters(self):
         # There is a letter 'e' in the word. We know it is not the first, mask is empty.
         # There is a letter 'n' in the word. We know it is not the third, mask is empty.
-        expected_words = ['aamen', 'ahven']
+        expected_words = [#'aamen',
+                          'ahven'
+                          ]
         words = self.dictionary._do_match_word(list('.....'), '', list('e.n..'))
         self.assertEqual(expected_words, words, "Find with two mandatory letters fail")
 

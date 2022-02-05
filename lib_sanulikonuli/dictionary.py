@@ -24,6 +24,7 @@ class Dictionary:
         self.words = None
         self.alphabet = alphabet
         self.unwanted_initial_letters = unwanted_initial_letters
+        self.word_len = 5
 
     @abstractmethod
     def import_words(self, xml_filename: str) -> list:
@@ -69,15 +70,9 @@ class Dictionary:
             if excluded_letters & set(word_letters):
                 continue
 
-            letters = set()
-            word_is_ok = True
-            for letter in word_letters:
-                if letter in letters:
-                    word_is_ok = False
-                    break
-                letters.add(letter)
-
-            if word_is_ok:
+            letters = set(word_letters)
+            if len(letters) == len(word_letters):
+                # Word contains only unique letters
                 initial_words.append(word)
 
         # print(initial_words)
@@ -100,10 +95,10 @@ class Dictionary:
         return random_word
 
     def _do_match_word(self, known_letters: list, excluded: list, mandatory_letters: list) -> list:
-        if len(known_letters) != 5:
-            raise ValueError("Mask must be 5 characters!")
-        if len(mandatory_letters) != 5:
-            raise ValueError("Mandatory must be 5 characters!")
+        if len(known_letters) != self.word_len:
+            raise ValueError("Mask must be {} characters!".format(self.word_len))
+        if len(mandatory_letters) != self.word_len:
+            raise ValueError("Mandatory must be {} characters!".format(self.word_len))
 
         excluded_letters = set(excluded)
         if set(mandatory_letters) & excluded_letters:
@@ -115,7 +110,7 @@ class Dictionary:
         mask_letter_cnt = 0
         mandatory_letter_positions = []
         mandatory_letter_cnt = 0
-        for idx in range(5):
+        for idx in range(self.word_len):
             index_processed = False
             if known_letters[idx] in self.alphabet:
                 mask_letter_positions.append(idx)
@@ -136,11 +131,12 @@ class Dictionary:
 
         # Find initial set of potential words based on mask letters
         potential_words = []
+        unique_potential_words = set()
         for word in self.words:
             word = word.lower()
             word_matches = True  # By default, word matches
             unmasked_letters_in_this_word = set()
-            for idx in range(5):
+            for idx in range(self.word_len):
                 if idx in mask_letter_positions:
                     if word[idx] != known_letters[idx]:
                         word_matches = False
@@ -156,6 +152,10 @@ class Dictionary:
                 # This word contains excluded letters
                 continue
 
+            # Remaining letters after mask should be unique to maximize attempt footprint.
+            if len(unmasked_letters_in_this_word) == self.word_len - mask_letter_cnt:
+                unique_potential_words.add(word)
+
             if word_matches:
                 potential_words.append(word)
                 # print(word)
@@ -164,8 +164,8 @@ class Dictionary:
 
         # Reduce list further by adding mandatory letters we know are in the word, but we don't know where.
         # One important thing: We KNOW it is NOT in the given position.
-        matching_words = []
-        prime_matching_words = []
+        matching_words = set()
+        prime_matching_words = set()
         for word in potential_words:
             word = str(word)
             known_positions = mask_letter_positions.copy()
@@ -175,7 +175,7 @@ class Dictionary:
             if mandatory_letter_positions:
                 for letter_pos in mandatory_letter_positions:
                     letter = mandatory_letters[letter_pos]
-                    for idx in range(5):
+                    for idx in range(self.word_len):
                         if idx == letter_pos:
                             # We know, this letter is in the word, but not in this position.
                             # Some other position will do the trick
@@ -199,14 +199,14 @@ class Dictionary:
                         break
                 # After all the matching, see how it went
                 if not word_is_invalid and letter_match_cnt == mandatory_letter_cnt:
-                    matching_words.append(word)
+                    matching_words.add(word)
                     # print(word)
                     log.debug("{}, match cnt: {}, len: {}".format(word, letter_match_cnt, len(added_letters)))
                     if len(added_letters) == letter_match_cnt:
-                        prime_matching_words.append(word)
+                        prime_matching_words.add(word)
             else:
                 # No mandatory letters at all
-                for idx in range(5):
+                for idx in range(self.word_len):
                     if idx in mask_letter_positions:
                         # Won't place a mandatory letter on a known letter position
                         continue
@@ -214,20 +214,23 @@ class Dictionary:
                     added_letters.add(letter)
 
                 # All words are matches
-                matching_words.append(word)
+                matching_words.add(word)
                 # print(word)
                 log.debug("{}, len: {}/{}".format(word, len(added_letters), mandatory_letter_cnt))
-                if len(added_letters) == 5 - mask_letter_cnt:
-                    prime_matching_words.append(word)
+                if len(added_letters) == self.word_len - mask_letter_cnt:
+                    prime_matching_words.add(word)
 
         if prime_matching_words:
+            even_primer_matching_words = unique_potential_words & set(prime_matching_words)
+            if even_primer_matching_words:
+                prime_matching_words = even_primer_matching_words
             # These words have more quality as they maximize footprint
             log.info("Found {} (total {}) words with letters '{}'".format(
                 len(prime_matching_words), len(matching_words), mandatory
             ))
-            return prime_matching_words
+            return sorted(list(prime_matching_words))
 
         # These words don't maximize footprint, but are still valid ones
         log.info("Found {} words with letters '{}'".format(len(matching_words), mandatory))
 
-        return matching_words
+        return sorted(list(matching_words))
