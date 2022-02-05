@@ -21,7 +21,7 @@ class KotusDictionary(Dictionary):
                 if len(elem.text) != 5 or " " in elem.text or "-" in elem.text:
                     continue
 
-                self.words.append(elem.text)
+                self.words.append(elem.text.lower())
                 log.debug(elem.text)
 
         log.debug("Added {} words".format(len(self.words)))

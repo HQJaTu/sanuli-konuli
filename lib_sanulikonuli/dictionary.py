@@ -50,24 +50,29 @@ class Dictionary:
         return wordlist_name, alphabet, unwanted_initial_letters, words
 
     def select_random_initial_word(self, excluded: str = None) -> str:
-        initial_words = self._initial_words(excluded)
+        unwanted_letters = list(self.unwanted_initial_letters)
+        if excluded:
+            excluded_letters = list(excluded)
+            attempt = unwanted_letters.copy()
+            attempt.extend(excluded_letters)
+            initial_words = self._initial_words(attempt)
+            if not initial_words:
+                # 2nd try without bad letters
+                initial_words = self._initial_words(excluded_letters)
+        else:
+            initial_words = self._initial_words(unwanted_letters)
+
         initial = random.choice(initial_words)
 
         return initial
 
-    def _initial_words(self, excluded: str = None) -> list:
+    def _initial_words(self, excluded: list) -> list:
         initial_words = []
-        bad_letters = set(list(self.unwanted_initial_letters))
-        if excluded:
-            excluded_letters = set(list(excluded))
-        else:
-            excluded_letters = set()
+        bad_letters = set(excluded)
 
         for word in self.words:
             word_letters = list(word)
             if bad_letters & set(word_letters):
-                continue
-            if excluded_letters & set(word_letters):
                 continue
 
             letters = set(word_letters)
