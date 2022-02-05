@@ -25,7 +25,7 @@ def _setup_logger(use_debug: bool) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description='Sanuli matching word finder')
+    parser = argparse.ArgumentParser(description='Match clues from Wordly/Sanuli with a dictionary')
     parser.add_argument('words_file', metavar="PROCESSED-WORDS-DAT-FILE",
                         help="Processed 5-letter words file.")
     parser.add_argument('match_mask', metavar="MATCH-MASK",

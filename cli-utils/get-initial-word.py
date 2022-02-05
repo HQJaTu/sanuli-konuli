@@ -25,7 +25,7 @@ def _setup_logger(use_debug: bool) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description='Sanuli initial word')
+    parser = argparse.ArgumentParser(description='Get initial word from saved dictionary')
     parser.add_argument('words_file', metavar="PROCESSED-WORDS-DAT-FILE",
                         help="Processed 5-letter words file.")
     parser.add_argument('excluded_letters', metavar="EXCLUDED-LETTERS", nargs="?",
