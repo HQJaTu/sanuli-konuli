@@ -86,7 +86,10 @@ class Dictionary:
         return initial_words
 
     def match_word(self, mask: str, excluded: str, mandatory: str) -> str:
-        matching_words = self._do_match_word(mask, excluded, mandatory)
+        known_letters = list(mask.lower())
+        excluded_letters = list(excluded)
+        mandatory_letters = list(mandatory.lower())
+        matching_words = self._do_match_word(known_letters, excluded_letters, mandatory_letters)
         for word in matching_words:
             print(word)
 
@@ -96,15 +99,15 @@ class Dictionary:
 
         return random_word
 
-    def _do_match_word(self, mask: str, excluded: str, mandatory: str) -> list:
-        if len(mask) != 5:
+    def _do_match_word(self, known_letters: list, excluded: list, mandatory_letters: list) -> list:
+        if len(known_letters) != 5:
             raise ValueError("Mask must be 5 characters!")
-        if len(mandatory) != 5:
+        if len(mandatory_letters) != 5:
             raise ValueError("Mandatory must be 5 characters!")
 
-        known_letters = list(mask.lower())
-        excluded_letters = set(list(excluded))
-        mandatory_letters = list(mandatory.lower())
+        excluded_letters = set(excluded)
+        mask = ''.join([l if l else '.' for l in known_letters])
+        mandatory = ''.join([l if l else '.' for l in mandatory_letters])
         mask_letter_positions = []
         mask_letter_cnt = 0
         mandatory_letter_positions = []
@@ -119,10 +122,10 @@ class Dictionary:
                 known_letters[idx] = None
             if mandatory_letters[idx] in self.alphabet:
                 if index_processed:
-                    log.error("Mandatory letter '{}' at position {} clashes with known letter '{}'".format(
-                        idx, mandatory_letters[idx], known_letters[idx]
+                    log.error("Invalid arguments! Mandatory letter '{}' at position {} clashes with known letter '{}'".format(
+                        mandatory_letters[idx], idx, known_letters[idx]
                     ))
-                    raise ValueError
+                    raise ValueError("Mask and mandatory conflict at {}".format(idx))
                 mandatory_letter_positions.append(idx)
                 mandatory_letter_cnt += 1
             else:
@@ -156,7 +159,8 @@ class Dictionary:
 
         log.info("Found {} potential words with mask '{}'".format(len(potential_words), mask))
 
-        # Reduce list further
+        # Reduce list further by adding mandatory letters we know are in the word, but we don't know where.
+        # One important thing: We KNOW it is NOT in the given position.
         matching_words = []
         prime_matching_words = []
         for word in potential_words:
@@ -164,6 +168,7 @@ class Dictionary:
             known_positions = mask_letter_positions.copy()
             added_letters = set()
             letter_match_cnt = 0
+            word_is_invalid = False
             if mandatory_letter_positions:
                 for letter_pos in mandatory_letter_positions:
                     letter = mandatory_letters[letter_pos]
@@ -171,6 +176,9 @@ class Dictionary:
                         if idx == letter_pos:
                             # We know, this letter is in the word, but not in this position.
                             # Some other position will do the trick
+                            if letter == word[idx]:
+                                word_is_invalid = True
+                                break
                             continue
                         if idx in mask_letter_positions:
                             # Won't place a mandatory letter on a known letter position
@@ -182,8 +190,12 @@ class Dictionary:
                             added_letters.add(letter)
                             letter_match_cnt += 1
                             break
+
+                    if word_is_invalid:
+                        # We figured this word to be very bad. Stop iterating
+                        break
                 # After all the matching, see how it went
-                if letter_match_cnt == mandatory_letter_cnt:
+                if not word_is_invalid and letter_match_cnt == mandatory_letter_cnt:
                     matching_words.append(word)
                     # print(word)
                     log.debug("{}, match cnt: {}, len: {}".format(word, letter_match_cnt, len(added_letters)))
