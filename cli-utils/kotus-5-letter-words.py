@@ -5,8 +5,7 @@
 import os
 import sys
 import argparse
-import pickle
-from lxml import etree  # lxml implements the ElementTree API, has better performance or more advanced features
+from lib_sanulikonuli import KotusDictionary
 import logging
 
 log = logging.getLogger(__name__)
@@ -27,35 +26,6 @@ def _setup_logger(use_debug: bool) -> None:
         log.setLevel(logging.INFO)
 
 
-def import_words(xml_filename: str) -> list:
-    words = []
-    with open(xml_filename, "rb") as fp:
-        context = etree.iterparse(fp, events=('end',))
-        for action, elem in context:
-            if elem.tag != 's':
-                continue
-
-            if len(elem.text) != 5 or " " in elem.text or "-" in elem.text:
-                continue
-
-            words.append(elem.text)
-            log.debug(elem.text)
-
-    log.debug("Added {} words".format(len(words)))
-
-    return words
-
-
-def save_words(words: list, output_file: str) -> None:
-    with open(output_file, "wb") as pick:
-        kotus_alphabet = 'abcdefghijklmnopqrstuvxyzåäö'
-        kotus_unwanted_initial_letters = "bcdfgqwxzöäå"
-        data = ('Kotus', kotus_alphabet, kotus_unwanted_initial_letters, words)
-        pickle.dump(data, pick)
-
-    log.info("Saved wordlist into {}".format(output_file))
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description='Kotus word-list converter')
     parser.add_argument('kotus_word_file', metavar="KOTUS-SANALISTA-V1-XML-FILE",
@@ -73,8 +43,9 @@ def main() -> None:
         exit(2)
 
     log.info("Begin reading {}".format(args.kotus_word_file))
-    words = import_words(args.kotus_word_file)
-    save_words(words, args.output_file)
+    words = KotusDictionary()
+    words.import_words(args.kotus_word_file)
+    words.save_words(args.output_file)
     log.info("Done.")
 
 

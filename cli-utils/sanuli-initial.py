@@ -5,10 +5,9 @@
 import os
 import sys
 import argparse
-import pickle
-import random
-from typing import Tuple
+
 import logging
+from lib_sanulikonuli import Dictionary
 
 log = logging.getLogger(__name__)
 
@@ -24,49 +23,6 @@ def _setup_logger(use_debug: bool) -> None:
         log.setLevel(logging.DEBUG)
     else:
         log.setLevel(logging.INFO)
-
-
-def load_5_letter_words(words_file: str) -> Tuple[str, str, str, list]:
-    with open(words_file, "rb") as pick:
-        wordlist_name, alphabet, unwanted_initial_letters, words = pickle.load(pick)
-
-    log.debug("Loaded {} words from {}".format(len(words), wordlist_name))
-
-    return wordlist_name, alphabet, unwanted_initial_letters, words
-
-
-def select_random_initial_word(unwanted_letters: str, words: list, excluded: str) -> str:
-    initial_words = []
-    bad_letters = set(list(unwanted_letters))
-    if excluded:
-        excluded_letters = set(list(excluded))
-    else:
-        excluded_letters = set()
-
-    for word in words:
-        word_letters = list(word)
-        if bad_letters & set(word_letters):
-            continue
-        if excluded_letters & set(word_letters):
-            continue
-
-        letters = set()
-        word_is_ok = True
-        for letter in word_letters:
-            if letter in letters:
-                word_is_ok = False
-                break
-            letters.add(letter)
-
-        if word_is_ok:
-            initial_words.append(word)
-
-    # print(initial_words)
-    log.debug("Loaded {} initial words".format(len(initial_words)))
-
-    initial = random.choice(initial_words)
-
-    return initial
 
 
 def main() -> None:
@@ -86,8 +42,9 @@ def main() -> None:
         exit(2)
 
     log.info("Load pre-saved words")
-    wordlist_name, _, unwanted_initial_letters, words = load_5_letter_words(args.words_file)
-    initial = select_random_initial_word(unwanted_initial_letters, words, args.excluded_letters)
+    words = Dictionary()
+    words.load_5_letter_words(args.words_file)
+    initial = words.select_random_initial_word(args.excluded_letters)
     log.info("Initial word is: {}".format(initial))
 
 
