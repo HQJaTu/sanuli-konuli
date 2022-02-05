@@ -49,6 +49,12 @@ class Dictionary:
         return wordlist_name, alphabet, unwanted_initial_letters, words
 
     def select_random_initial_word(self, excluded: str = None) -> str:
+        initial_words = self._initial_words(excluded)
+        initial = random.choice(initial_words)
+
+        return initial
+
+    def _initial_words(self, excluded: str = None) -> list:
         initial_words = []
         bad_letters = set(list(self.unwanted_initial_letters))
         if excluded:
@@ -77,11 +83,25 @@ class Dictionary:
         # print(initial_words)
         log.debug("Loaded {} initial words".format(len(initial_words)))
 
-        initial = random.choice(initial_words)
+        return initial_words
 
-        return initial
+    def match_word(self, mask: str, excluded: str, mandatory: str) -> str:
+        matching_words = self._do_match_word(mask, excluded, mandatory)
+        for word in matching_words:
+            print(word)
 
-    def match_word(self, mask: str, excluded: str, mandatory: str) -> None:
+        random_word = random.choice(matching_words)
+
+        log.info("Random word is: {}".format(random_word))
+
+        return random_word
+
+    def _do_match_word(self, mask: str, excluded: str, mandatory: str) -> list:
+        if len(mask) != 5:
+            raise ValueError("Mask must be 5 characters!")
+        if len(mandatory) != 5:
+            raise ValueError("Mandatory must be 5 characters!")
+
         known_letters = list(mask.lower())
         excluded_letters = set(list(excluded))
         mandatory_letters = list(mandatory.lower())
@@ -186,16 +206,13 @@ class Dictionary:
                     prime_matching_words.append(word)
 
         if prime_matching_words:
-            for word in prime_matching_words:
-                print(word)
+            # These words have more quality as they maximize footprint
             log.info("Found {} (total {}) words with letters '{}'".format(
                 len(prime_matching_words), len(matching_words), mandatory
             ))
-            random_word = random.choice(prime_matching_words)
-        else:
-            for word in matching_words:
-                print(word)
-            log.info("Found {} words with letters '{}'".format(len(matching_words), mandatory))
-            random_word = random.choice(matching_words)
+            return prime_matching_words
 
-        log.info("Random word is: {}".format(random_word))
+        # These words don't maximize footprint, but are still valid ones
+        log.info("Found {} words with letters '{}'".format(len(matching_words), mandatory))
+
+        return matching_words
