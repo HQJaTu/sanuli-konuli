@@ -68,3 +68,21 @@ class TestFindWord(DictionaryTestBase):
         expected_words = ['ahven']
         words = self.dictionary._do_match_word(list('.h...'), '', list('e.n..'))
         self.assertEqual(expected_words, words, "Find with one mask and one mandatory letters fail")
+
+    def test_one_exclude_letter(self):
+        # There is no letter 'a' in the word at all.
+        expected_words = ['bänet', 'ehtyä', 'entäs', 'estyä']
+        words = self.dictionary._do_match_word(list('.....'), 'a', list('.....'))
+        self.assertEqual(expected_words, words, "Find with one mask letter fail")
+
+    def test_one_mask_and_one_exclude_letter(self):
+        # We know first letter of the word is 'e' and and there is no letter 't' anywhere else.
+        expected_words = ['eheys']
+        words = self.dictionary._do_match_word(list('e....'), 't', list('.....'))
+        self.assertEqual(expected_words, words, "Find with one mask letter fail")
+
+    def test_one_mask_and_matching_exclude_letter(self):
+        # We know first letter of the word is 'e' and and there is no letter 'e' anywhere else.
+        expected_words = ['ehtyä', 'entäs', 'erota', 'estyä']
+        words = self.dictionary._do_match_word(list('e....'), 'e', list('.....'))
+        self.assertEqual(expected_words, words, "Find with one mask letter fail")

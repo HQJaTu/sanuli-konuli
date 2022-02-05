@@ -106,6 +106,9 @@ class Dictionary:
             raise ValueError("Mandatory must be 5 characters!")
 
         excluded_letters = set(excluded)
+        if set(mandatory_letters) & excluded_letters:
+            raise ValueError("Excluded letters must not exist in mandatory ones!")
+
         mask = ''.join([l if l else '.' for l in known_letters])
         mandatory = ''.join([l if l else '.' for l in mandatory_letters])
         mask_letter_positions = []
