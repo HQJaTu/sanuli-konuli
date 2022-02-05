@@ -24,6 +24,12 @@ class TestFindWord(DictionaryTestBase):
         words = self.dictionary._do_match_word(list('a....'), '', list('.....'))
         self.assertEqual(expected_words, words, "Find with one mask letter fail")
 
+    def test_negative_one_mask_letter(self):
+        # First letter of the word must have letter 'x' first
+        expected_words = []
+        words = self.dictionary._do_match_word(list('x....'), '', list('.....'))
+        self.assertEqual(expected_words, words, "Find with one mask letter fail")
+
     def test_two_mask_letters(self):
         # First two letter of the word must have letters 'a' and 's'
         expected_words = ['asema', 'asemo']
