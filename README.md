@@ -96,12 +96,15 @@ Lacking good English dictionary.
 
 # Example Sanuli game:
 
+Note: This sample game didn't produce any yellow clues.
+
 ## Round 1:
 ```bash
 get-initial-word.py words/kotus-sanalista_v1.dat
 ```
-Initial word: HALKO
-Result: H and A are on green (correct letter, correct position),
+**Initial word**: _HALKO_
+
+**Result**: H and A are on green (correct letter, correct position),
 L, K and O are on grey (word does not have those letters).
 
 ## Round 2:
@@ -109,8 +112,9 @@ Command to reflect Round 1 clues:
 ```bash
 find-matching-word.py words/kotus-sanalista_v1.dat "ha..." "lko" "....."
 ```
-Attempt: haima
-Result: H and both A are on green,
+**Attempt**: _HAIMA_
+
+**Result**: H and both A are on green,
 I and M are on grey.
 
 ## Round 3:
@@ -118,8 +122,9 @@ Command to reflect Round 2 clues:
 ```bash
 find-matching-word.py words/kotus-sanalista_v1.dat "ha..a" "lkoim" "....."
 ```
-Attempt: hauta
-Result: H, U and both A are on green,
+**Attempt**: _HAUTA_
+
+**Result**: H, U and both A are on green,
 T is on grey.
 
 ## Round 4:
@@ -127,5 +132,6 @@ Command to reflect Round 3 clues:
 ```bash
 find-matching-word.py words/kotus-sanalista_v1.dat "hau.a" "lkoimt" "....."
 ```
-Attempt: hauva
-Result: WIN!
+**Attempt**: _HAUVA_
+
+**Result**: WIN!
