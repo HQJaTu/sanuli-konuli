@@ -5,7 +5,7 @@
 import os
 import sys
 import argparse
-from lib_sanulikonuli import NltkDictionary
+from lib_sanulikonuli.importers.nltk_dictionary import NltkDictionary
 import logging
 
 log = logging.getLogger(__name__)
@@ -28,8 +28,10 @@ def _setup_logger(use_debug: bool) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description='NLTK word-list converter')
+    parser.add_argument('number_of_letters', metavar="WORD-LENGTH", type=int,
+                        help="Number of letters to import from wordlist")
     parser.add_argument('--output-file', default=NLTK_WORDFILE,
-                        help="Processed 5-letter words file. Default: {}".format(NLTK_WORDFILE))
+                        help="Processed wordlist file. Default: {}".format(NLTK_WORDFILE))
     parser.add_argument('--debug', action="store_true", default=False,
                         help="Make logging use DEBUG instead of default INFO.")
 
@@ -38,7 +40,7 @@ def main() -> None:
 
     log.info("Begin")
     words = NltkDictionary()
-    words.import_words("")
+    words.import_words(args.number_of_letters, "")
     words.save_words(args.output_file)
     log.info("Done.")
 

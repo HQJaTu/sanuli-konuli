@@ -5,7 +5,7 @@
 import os
 import sys
 import argparse
-from lib_sanulikonuli import KotusDictionary
+from lib_sanulikonuli.importers.kotus_dictionary import KotusDictionary
 import logging
 
 log = logging.getLogger(__name__)
@@ -30,8 +30,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description='Kotus word-list converter')
     parser.add_argument('kotus_word_file', metavar="KOTUS-SANALISTA-V1-XML-FILE",
                         help='Finnish wordlist')
+    parser.add_argument('number_of_letters', metavar="WORD-LENGTH", type=int,
+                        help="Number of letters to import from wordlist")
     parser.add_argument('--output-file', default=KOTUS_WORDFILE,
-                        help="Processed 5-letter words file. Default: {}".format(KOTUS_WORDFILE))
+                        help="Processed wordlist file. Default: {}".format(KOTUS_WORDFILE))
     parser.add_argument('--debug', action="store_true", default=False,
                         help="Make logging use DEBUG instead of default INFO.")
 
@@ -44,7 +46,7 @@ def main() -> None:
 
     log.info("Begin reading {}".format(args.kotus_word_file))
     words = KotusDictionary()
-    words.import_words(args.kotus_word_file)
+    words.import_words(args.number_of_letters, args.kotus_word_file)
     words.save_words(args.output_file)
     log.info("Done.")
 

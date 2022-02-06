@@ -16,13 +16,16 @@ class NltkDictionary(Dictionary):
                          'abcdefghijklmnopqrstuvxyz', "jqxzwvfybh")
         # Least frequent dictionary letters from: https://en.wikipedia.org/wiki/Letter_frequency
 
-        # Prep!
         # NLTK Corpora list: https://www.nltk.org/nltk_data/
+        # Prep! Download dependencies first.
+        # Note: LazyLoader don't care about order as long as all deps are ready when needed later.
         nltk_download('omw-1.4')
         nltk_download('wordnet')
+        # Import the one we want too.
         nltk_download(self.CORPUS)
 
-    def import_words(self, xml_filename: str) -> list:
+    def import_words(self, number_of_letters: int, xml_filename: str) -> list:
+        self.word_len = number_of_letters
         self.words = []
         alphabet = set(list(self.alphabet))
         for word in corpus.wordnet2021.words():
@@ -35,7 +38,7 @@ class NltkDictionary(Dictionary):
                 continue
 
             self.words.append(word.lower())
-            log.debug(word)
+            log.debug("{}-letter word: {}".format(self.word_len, word))
 
         log.debug("Added {} words".format(len(self.words)))
 

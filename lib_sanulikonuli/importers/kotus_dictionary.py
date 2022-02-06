@@ -10,19 +10,26 @@ class KotusDictionary(Dictionary):
     def __init__(self):
         super().__init__("Kotus", 'abcdefghijklmnopqrstuvxyzåäö', "bcdfgqwxzöäå")
 
-    def import_words(self, xml_filename: str) -> list:
+    def import_words(self, number_of_letters: int, xml_filename: str) -> list:
+        self.word_len = number_of_letters
         self.words = []
+        alphabet = set(list(self.alphabet))
         with open(xml_filename, "rb") as fp:
             context = etree.iterparse(fp, events=('end',))
             for action, elem in context:
                 if elem.tag != 's':
                     continue
 
-                if len(elem.text) != 5 or " " in elem.text or "-" in elem.text:
+                if len(elem.text) != self.word_len:
+                    continue
+
+                characters = set(list(elem.text.lower()))
+                if characters - alphabet:
+                    # Not all characters are in alphabet. Skip this.
                     continue
 
                 self.words.append(elem.text.lower())
-                log.debug(elem.text)
+                log.debug("{}-letter word: {}".format(self.word_len, elem.text))
 
         log.debug("Added {} words".format(len(self.words)))
 

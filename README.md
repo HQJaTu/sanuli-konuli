@@ -4,36 +4,76 @@ Solver for Finnish Wordly, Sanuli.
 Code is generic and will work on any language. See class _KotusDictionary_
 on how Finnish dictionary is handled.
 
+Entire solution is generic and does not depend on any specific spoken (written)
+language nor dictionary. For example, English is fully supported.
+
+## Anecdote: Meaning of this weird name
+
+This set of tools and libraries are called "_Sanuli-konuli_".
+In Finnish language, they could be understood as very (annoyingly) naive way
+of sying "_sanakone_".
+
+All this originates from [Sanuli](https://sanuli.fi), whose author, Mr. J. Husso
+said his Wordly clone for Finnish language got this name from his colleague who
+invented this name. "_The name was so annoying, I loved it immediately!_", he
+has been told to say for media regarding the chosen name.
+
 # Workflow
 
 ## Import a dictionary (once)
-As this works best with [Sanuli](https://sanuli.fi), there is an importer for
-Finnish word list from Kotus. This dictionary can be downloaded and used freely
+
+This is a one-time task, resulting `.dat` file will be needed in later operations.
+
+### Example: Import Finnish dictionary
+
+As this code has been developed with [Sanuli](https://sanuli.fi), there is an importer for
+Finnish word list from Kotus used by Sanuli. This dictionary can be downloaded and used freely
 with LGPL-license at https://kaino.kotus.fi/sanat/nykysuomi/.
 
-Utility `kotus-5-letter-words.py` will read the XML-file, parse it,
-extract words from it and save all 5 letter words having no special characters.
+Utility `kotus-import-words.py` will read the XML-file, parse it,
+extract words from it and save all matching words having no special characters.
 
 ```bash
-usage: kotus-5-letter-words.py [-h] [--output-file OUTPUT_FILE] [--debug]
-KOTUS-SANALISTA-V1-XML-FILE
+usage: kotus-import-words.py [-h] [--output-file OUTPUT_FILE] [--debug]
+                             KOTUS-SANALISTA-V1-XML-FILE WORD-LENGTH
 
 Kotus word-list converter
 
 positional arguments:
   KOTUS-SANALISTA-V1-XML-FILE
                         Finnish wordlist
+  WORD-LENGTH           Number of letters to import from wordlist
 
 optional arguments:
   -h, --help            show this help message and exit
   --output-file OUTPUT_FILE
-                        Processed 5-letter words file. Default: kotus-
+                        Processed wordlist file. Default: kotus-
                         sanalista_v1.dat
   --debug               Make logging use DEBUG instead of default INFO.
-
 ```
 
-This is a one-time task, resulting `.dat` file will be needed in later operations.
+### Example: Import English dictionary
+
+Software library Natural Language Toolkit (NLTK) has multiple English language
+wordlists. They are available at https://www.nltk.org/nltk_data/.
+
+Utility `nltk-import-words.py` will read the XML-file, parse it,
+extract words from it and save all matching words having no special characters.
+
+```bash
+usage: nltk-import-words.py [-h] [--output-file OUTPUT_FILE] [--debug] WORD-LENGTH
+
+NLTK word-list converter
+
+positional arguments:
+  WORD-LENGTH           Number of letters to import from wordlist
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --output-file OUTPUT_FILE
+                        Processed wordlist file. Default: nltk-wordnet2021.dat
+  --debug               Make logging use DEBUG instead of default INFO.
+```
 
 ## Pick an initial word randomly
 

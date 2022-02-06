@@ -27,23 +27,26 @@ class Dictionary:
         self.word_len = 5
 
     @abstractmethod
-    def import_words(self, xml_filename: str) -> list:
+    def import_words(self, number_of_letters: int, filename: str) -> list:
         pass
 
     def save_words(self, output_file: str) -> None:
         with open(output_file, "wb") as pick:
-            data = (self.name, self.alphabet, self.unwanted_initial_letters, self.words)
+            data = (self.name, self.word_len, self.alphabet, self.unwanted_initial_letters, self.words)
             pickle.dump(data, pick)
 
-        log.info("Saved wordlist into {}".format(output_file))
+        log.info("Saved wordlist for {}-letter words containing {} words into {}".format(
+            self.word_len, len(self.words), output_file
+        ))
 
     def load_5_letter_words(self, words_file: str) -> Tuple[str, str, str, list]:
         with open(words_file, "rb") as pick:
-            wordlist_name, alphabet, unwanted_initial_letters, words = pickle.load(pick)
+            wordlist_name, word_len, alphabet, unwanted_initial_letters, words = pickle.load(pick)
 
         self.name = wordlist_name
         self.alphabet = alphabet
         self.unwanted_initial_letters = unwanted_initial_letters
+        self.word_len = word_len
         self.words = words
         log.debug("Loaded {} words from {}".format(len(self.words), wordlist_name))
 
