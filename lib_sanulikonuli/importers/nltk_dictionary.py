@@ -1,6 +1,6 @@
 from nltk import corpus, download as nltk_download
 import logging
-from .dictionary import Dictionary
+from ..dictionary import Dictionary
 
 log = logging.getLogger(__name__)
 
