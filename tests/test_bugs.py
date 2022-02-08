@@ -20,11 +20,13 @@ class TestBugs(DictionaryTestBase):
     def test_incorrect_mandatory(self):
         # This is a set of prime words to maximize the attempt footprint
         expected_words = []
-        words = self.dictionary._do_match_word(list("l.s.ä"), 'veoakysi', list(".ä..."))
+        words, prime_words = self.dictionary._do_match_word(list("l.s.ä"), 'veoakysi', list(".ä..."))
         self.assertEqual(expected_words, words, "Find with no criteria at all fail")
+        self.assertEqual(None, prime_words, "Find with no criteria at all fail")
 
     def test_correct_mandatory(self):
         # This is a set of prime words to maximize the attempt footprint
         expected_words = ['läsnä']
-        words = self.dictionary._do_match_word(list("l.s.ä"), 'veoakysi', list("...ä."))
-        self.assertEqual(expected_words, words, "Find with no criteria at all fail")
+        words, prime_words = self.dictionary._do_match_word(list("l.s.ä"), 'veoakysi', list("...ä."))
+        self.assertEqual([], words, "Find with no criteria at all fail")
+        self.assertEqual(expected_words, prime_words, "Find with no criteria at all fail")

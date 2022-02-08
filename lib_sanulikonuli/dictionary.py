@@ -92,14 +92,17 @@ class Dictionary:
         known_letters = list(mask.lower())
         excluded_letters = list(excluded)
         mandatory_letters = list(mandatory.lower())
-        matching_words = self._do_match_word(known_letters, excluded_letters, mandatory_letters)
+        matching_words, prime_words = self._do_match_word(known_letters, excluded_letters, mandatory_letters)
         if not matching_words:
             log.warning("No words matched!")
 
             return None
 
         for word in matching_words:
-            print(word)
+            print("{} {}".format(" ", word))
+        if prime_words:
+            for word in prime_words:
+                print("{} {}".format("P", word))
 
         random_word = random.choice(matching_words)
 
@@ -107,7 +110,7 @@ class Dictionary:
 
         return random_word
 
-    def _do_match_word(self, known_letters: list, excluded: list, mandatory_letters: list) -> list:
+    def _do_match_word(self, known_letters: list, excluded: list, mandatory_letters: list) -> Tuple[list, list]:
         if len(known_letters) != self.word_len:
             raise ValueError("Mask must be {} characters!".format(self.word_len))
         if len(mandatory_letters) != self.word_len:
@@ -133,9 +136,10 @@ class Dictionary:
                 known_letters[idx] = None
             if mandatory_letters[idx] in self.alphabet:
                 if index_processed:
-                    log.error("Invalid arguments! Mandatory letter '{}' at position {} clashes with known letter '{}'".format(
-                        mandatory_letters[idx], idx, known_letters[idx]
-                    ))
+                    log.error(
+                        "Invalid arguments! Mandatory letter '{}' at position {} clashes with known letter '{}'".format(
+                            mandatory_letters[idx], idx, known_letters[idx]
+                        ))
                     raise ValueError("Mask and mandatory conflict at {}".format(idx))
                 mandatory_letter_positions.append(idx)
                 mandatory_letter_cnt += 1
@@ -241,9 +245,13 @@ class Dictionary:
             log.info("Found {} (total {}) words with letters '{}'".format(
                 len(prime_matching_words), len(matching_words), mandatory
             ))
-            return sorted(list(prime_matching_words))
 
-        # These words don't maximize footprint, but are still valid ones
-        log.info("Found {} words with letters '{}'".format(len(matching_words), mandatory))
+            prime_words_out = sorted(list(prime_matching_words))
+            words_out = sorted(list(matching_words - prime_matching_words))
+        else:
+            # These words don't maximize footprint, but are still valid ones
+            log.info("Found {} words with letters '{}'".format(len(matching_words), mandatory))
+            prime_words_out = None
+            words_out = sorted(list(matching_words))
 
-        return sorted(list(matching_words))
+        return words_out, prime_words_out

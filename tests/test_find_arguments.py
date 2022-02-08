@@ -39,6 +39,8 @@ class TestFindArguments(DictionaryTestBase):
         # Both values are valid, conflict, but this is ok.
         # In this example we know letter 'e' is the first letter of the word and no other can be 'e'.
         # Ref.: see test_one_mask_and_matching_exclude_letter()
-        expected_words = ['ehtyä', 'entäs', 'erota', 'estyä']
-        words = self.dictionary._do_match_word(list('e....'), 'e', list('.....'))
+        expected_prime = ['ehtyä', 'entäs', 'erota', 'estyä']
+        expected_words = ['ehtoo', 'entää', 'eroon', 'estää', 'etana', 'etuus', 'evätä']
+        words, prime_words = self.dictionary._do_match_word(list('e....'), 'e', list('.....'))
         self.assertEqual(expected_words, words, "Find with one mask letter fail")
+        self.assertEqual(expected_prime, prime_words, "Find with one mask letter fail")
