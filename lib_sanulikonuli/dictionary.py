@@ -93,19 +93,20 @@ class Dictionary:
         excluded_letters = list(excluded)
         mandatory_letters = list(mandatory.lower())
         matching_words, prime_words = self._do_match_word(known_letters, excluded_letters, mandatory_letters)
-        if not matching_words:
+        if not matching_words and not prime_words:
             log.warning("No words matched!")
 
             return None
 
-        for word in matching_words:
-            print("{} {}".format(" ", word))
+        random_word = None
+        if matching_words:
+            for word in matching_words:
+                print("{} {}".format(" ", word))
+            random_word = random.choice(matching_words)
         if prime_words:
             for word in prime_words:
                 print("{} {}".format("P", word))
             random_word = random.choice(prime_words)
-        else:
-            random_word = random.choice(matching_words)
 
         log.info("Random word is: {}".format(random_word))
 
