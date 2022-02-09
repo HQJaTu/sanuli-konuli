@@ -103,8 +103,9 @@ class Dictionary:
         if prime_words:
             for word in prime_words:
                 print("{} {}".format("P", word))
-
-        random_word = random.choice(matching_words)
+            random_word = random.choice(prime_words)
+        else:
+            random_word = random.choice(matching_words)
 
         log.info("Random word is: {}".format(random_word))
 
