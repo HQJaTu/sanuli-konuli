@@ -1,6 +1,10 @@
 words/
 venv*
 
+# Selenium
+selenium-binaries/
+geckodriver.log
+
 *.py[cod]
 
 # C extensions
