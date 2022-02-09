@@ -42,7 +42,7 @@ def main() -> None:
 
     log.info("Load pre-saved words")
     words = Dictionary()
-    words.load_5_letter_words(args.words_file)
+    words.load_words(args.words_file)
     initial = words.select_random_initial_word(args.excluded_letters)
     log.info("Initial word is: {}".format(initial))
 

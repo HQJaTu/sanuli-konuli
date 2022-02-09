@@ -53,7 +53,7 @@ def main() -> None:
 
     log.info("Load pre-saved words from {}".format(args.words_file))
     words = Dictionary()
-    words.load_5_letter_words(args.words_file)
+    words.load_words(args.words_file)
     words.match_word(args.match_mask, args.excluded_letters, args.known_letters)
     log.info("Done matching.")
 

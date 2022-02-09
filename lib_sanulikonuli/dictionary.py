@@ -39,7 +39,7 @@ class Dictionary:
             self.word_len, len(self.words), output_file
         ))
 
-    def load_5_letter_words(self, words_file: str) -> Tuple[str, str, str, list]:
+    def load_words(self, words_file: str) -> Tuple[str, str, str, list]:
         with open(words_file, "rb") as pick:
             wordlist_name, word_len, alphabet, unwanted_initial_letters, words = pickle.load(pick)
 
