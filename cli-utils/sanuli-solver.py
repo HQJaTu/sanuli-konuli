@@ -23,6 +23,9 @@ STATUS_GREEN = 'G'
 ACTION_BAD_WORD = 'B'
 ACTION_NEXT_WORD = 'N'
 ACTION_NEW_SANULI = 'W'
+ACTION_GAME_FAILED = 'F'
+DELAY_BETWEEN_WORDS = 0.2
+DELAY_BETWEEN_GAMES = 3
 
 SANULI_URL = r"https://sanuli.fi/"
 log = logging.getLogger(__name__)
@@ -57,14 +60,14 @@ def automate_sanuli(words: Dictionary, firefox: str = None) -> None:
 
         # New game after delay
         # Need to reload page to get more words
-        time.sleep(5)
-        driver.refresh()
-        board_element, root_html = _get_main_elements(driver)
+        time.sleep(DELAY_BETWEEN_GAMES)
+        #driver.refresh()
+        #board_element, root_html = _get_main_elements(driver)
         root_html.send_keys(webdriver.common.keys.Keys.RETURN)
 
 
 def _get_main_elements(driver) -> Tuple[WebElement, WebElement]:
-    delay = 3  # seconds
+    delay = DELAY_BETWEEN_GAMES  # seconds
     try:
         container = WebDriverWait(driver, delay).until(
             lambda x: x.find_element(By.XPATH, '//div[@class="board-container"]')
@@ -93,8 +96,6 @@ def _get_main_elements(driver) -> Tuple[WebElement, WebElement]:
 
 
 def _play_game(root_html: WebElement, board_element: WebElement, words: Dictionary):
-    current_row = -1
-    next_action = ACTION_BAD_WORD
     fail_cnt = 0
 
     def _do_initial_round(current_row: int, bad_letters: str = None) -> str:
@@ -115,11 +116,16 @@ def _play_game(root_html: WebElement, board_element: WebElement, words: Dictiona
         return next_action
 
     # Go!
-    while current_row < 6 and next_action != ACTION_NEW_SANULI:
+    next_action = ACTION_BAD_WORD
+    while next_action not in [ACTION_NEW_SANULI, ACTION_GAME_FAILED]:
         current_row, board = _load_board(board_element)
+        if current_row is None:
+            raise RuntimeError("Internal: Failed to read board! This should never happen.")
+
         if current_row == 0:
             log.info("Attempt 1: Initial")
             next_action = _do_initial_round(current_row)
+            time.sleep(DELAY_BETWEEN_WORDS)
             continue
 
         # We're in the game
@@ -138,6 +144,8 @@ def _play_game(root_html: WebElement, board_element: WebElement, words: Dictiona
                 fail_cnt += 1
                 word = words.match_word(green_letters, gray_letters, yellow_letters)
                 next_action = _send_word(root_html, current_row, word)
+
+                time.sleep(1)
 
     if next_action == ACTION_NEW_SANULI:
         log.info("Win! Word: {}".format(word))
@@ -194,16 +202,26 @@ def _send_word(key_receiver_element: WebElement, game_row: int, word: str) -> st
     # Evaluate if this word was accepted
     message = key_receiver_element.find_element(By.XPATH, './/div[@class="message"]')
     if message and message.text:
-        log.warning("Message: {}".format(message.text))
         if message.text.startswith('LÖYSIT SANAN!'):
-            log.info("Jee!")
-
             return ACTION_NEW_SANULI
 
         if message.text.startswith('EI SANULISTALLA.'):
             log.warning("Bad word: {}".format(word))
 
+            time.sleep(1)
+            log.debug("Cleaning failed attempt.")
+            for clean_up in range(5):
+                key_receiver_element.send_keys(webdriver.common.keys.Keys.BACKSPACE)
+
             return ACTION_BAD_WORD
+
+        if message.text.startswith('SANA OLI "'):
+            log.warning("Game failed!")
+
+            return ACTION_GAME_FAILED
+
+        # Unknown text
+        log.warning("Message: {}".format(message.text))
 
     return ACTION_NEXT_WORD
 
