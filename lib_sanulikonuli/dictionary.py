@@ -88,11 +88,15 @@ class Dictionary:
 
         return initial_words
 
-    def match_word(self, mask: str, excluded: str, mandatory: str) -> Union[str, None]:
-        known_letters = list(mask.lower())
-        excluded_letters = list(excluded)
-        mandatory_letters = list(mandatory.lower())
-        matching_words, prime_words = self._do_match_word(known_letters, excluded_letters, mandatory_letters)
+    def match_word(self, word_mask: str, excluded_letters: str, mandatory_mask: str,
+                   invalid_words: list = None) -> Union[str, None]:
+        known_letters = list(word_mask.lower())
+        excluded_letters = list(excluded_letters)
+        mandatory_letters = list(mandatory_mask.lower())
+        if not invalid_words:
+            invalid_words = []
+        matching_words, prime_words = self._do_match_word(known_letters, excluded_letters,
+                                                          mandatory_letters, invalid_words)
         if not matching_words and not prime_words:
             log.warning("No words matched!")
 
@@ -112,7 +116,8 @@ class Dictionary:
 
         return random_word
 
-    def _do_match_word(self, known_letters: list, excluded: list, mandatory_letters: list) -> Tuple[list, list]:
+    def _do_match_word(self, known_letters: list, excluded: list, mandatory_letters: list,
+                       invalid_words: list) -> Tuple[list, list]:
         if len(known_letters) != self.word_len:
             raise ValueError("Mask must be {} characters!".format(self.word_len))
         if len(mandatory_letters) != self.word_len:
@@ -154,6 +159,10 @@ class Dictionary:
         potential_words = []
         unique_potential_words = set()
         for word in self.words:
+            if word in invalid_words:
+                # Skip this as it is not wanted.
+                continue
+
             word = word.lower()
             word_matches = True  # By default, word matches
             unmasked_letters_in_this_word = set()

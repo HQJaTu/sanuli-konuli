@@ -40,7 +40,7 @@ class TestFindWord(DictionaryTestBase):
                           'estyä',
                           'heavy',
                           'hefta']
-        words, prime_words = self.dictionary._do_match_word(list('.....'), '', list('.....'))
+        words, prime_words = self.dictionary._do_match_word(list('.....'), '', list('.....'), [])
         self.assertEqual(expected_words, words, "Find with no criteria at all fail")
         self.assertEqual(expected_prime, prime_words, "Find with no criteria at all fail")
 
@@ -48,14 +48,14 @@ class TestFindWord(DictionaryTestBase):
         # First letter of the word must have letter 'a' first
         expected_prime = ['aamen', 'ahven', 'ameba', 'asema', 'asemo', 'aueta']
         expected_words = ['asete']
-        words, prime_words = self.dictionary._do_match_word(list('a....'), '', list('.....'))
+        words, prime_words = self.dictionary._do_match_word(list('a....'), '', list('.....'), [])
         self.assertEqual(expected_words, words, "Find with one mask letter fail")
         self.assertEqual(expected_prime, prime_words, "Find with one mask letter fail")
 
     def test_negative_one_mask_letter(self):
         # First letter of the word must have letter 'x' first
         expected_words = []
-        words, prime_words = self.dictionary._do_match_word(list('x....'), '', list('.....'))
+        words, prime_words = self.dictionary._do_match_word(list('x....'), '', list('.....'), [])
         self.assertEqual(expected_words, words, "Find with one mask letter fail")
         self.assertEqual(None, prime_words, "Find with one mask letter fail")
 
@@ -63,7 +63,7 @@ class TestFindWord(DictionaryTestBase):
         # First two letter of the word must have letters 'a' and 's'
         expected_prime = ['asema', 'asemo']
         expected_words = ['asete']
-        words, prime_words = self.dictionary._do_match_word(list('as...'), '', list('.....'))
+        words, prime_words = self.dictionary._do_match_word(list('as...'), '', list('.....'), [])
         self.assertEqual(expected_words, words, "Find with two mask letters fail")
         self.assertEqual(expected_prime, prime_words, "Find with two mask letters fail")
 
@@ -71,7 +71,7 @@ class TestFindWord(DictionaryTestBase):
         # First letter of the word must have letter 'e', third letter 'e' and fourth letter 't'
         expected_prime = ['edetä', 'enetä']
         expected_words = []
-        words, prime_words = self.dictionary._do_match_word(list('e.et.'), '', list('.....'))
+        words, prime_words = self.dictionary._do_match_word(list('e.et.'), '', list('.....'), [])
         self.assertEqual(expected_words, words, "Find with three mask letters fail")
         self.assertEqual(expected_prime, prime_words, "Find with three mask letters fail")
 
@@ -103,7 +103,7 @@ class TestFindWord(DictionaryTestBase):
                           'debet',
                           'genre',
                           'getto']
-        words, prime_words = self.dictionary._do_match_word(list('.....'), '', list('e....'))
+        words, prime_words = self.dictionary._do_match_word(list('.....'), '', list('e....'), [])
         self.assertEqual(expected_words, words, "Find with one mandatory letters fail")
         self.assertEqual(expected_prime, prime_words, "Find with one mandatory letters fail")
 
@@ -114,14 +114,14 @@ class TestFindWord(DictionaryTestBase):
             'ahven'
         ]
         expected_words = ['aamen']
-        words, prime_words = self.dictionary._do_match_word(list('.....'), '', list('e.n..'))
+        words, prime_words = self.dictionary._do_match_word(list('.....'), '', list('e.n..'), [])
         self.assertEqual(expected_words, words, "Find with two mandatory letters fail")
         self.assertEqual(expected_prime, prime_words, "Find with two mandatory letters fail")
 
     def test_one_mask_and_one_mandatory_letter(self):
         expected_prime = ['ahven']
         expected_words = []
-        words, prime_words = self.dictionary._do_match_word(list('.h...'), '', list('e.n..'))
+        words, prime_words = self.dictionary._do_match_word(list('.h...'), '', list('e.n..'), [])
         self.assertEqual(expected_words, words, "Find with one mask and one mandatory letters fail")
         self.assertEqual(expected_prime, prime_words, "Find with one mask and one mandatory letters fail")
 
@@ -146,7 +146,7 @@ class TestFindWord(DictionaryTestBase):
                           'evätä',
                           'genre',
                           'getto']
-        words, prime_words = self.dictionary._do_match_word(list('.....'), 'a', list('.....'))
+        words, prime_words = self.dictionary._do_match_word(list('.....'), 'a', list('.....'), [])
         self.assertEqual(expected_words, words, "Find with one mask letter fail")
         self.assertEqual(expected_prime, prime_words, "Find with one mask letter fail")
 
@@ -154,7 +154,7 @@ class TestFindWord(DictionaryTestBase):
         # We know first letter of the word is 'e' and and there is no letter 't' anywhere else.
         expected_prime = ['eheys']
         expected_words = ['eeden', 'ennen', 'eroon', 'essee']
-        words, prime_words = self.dictionary._do_match_word(list('e....'), 't', list('.....'))
+        words, prime_words = self.dictionary._do_match_word(list('e....'), 't', list('.....'), [])
         self.assertEqual(expected_words, words, "Find with one mask letter fail")
         self.assertEqual(expected_prime, prime_words, "Find with one mask letter fail")
 
@@ -162,6 +162,6 @@ class TestFindWord(DictionaryTestBase):
         # We know first letter of the word is 'e' and and there is no letter 'e' anywhere else.
         expected_prime = ['ehtyä', 'entäs', 'erota', 'estyä']
         expected_words = ['ehtoo', 'entää', 'eroon', 'estää', 'etana', 'etuus', 'evätä']
-        words, prime_words = self.dictionary._do_match_word(list('e....'), 'e', list('.....'))
+        words, prime_words = self.dictionary._do_match_word(list('e....'), 'e', list('.....'), [])
         self.assertEqual(expected_words, words, "Find with one mask letter fail")
         self.assertEqual(expected_prime, prime_words, "Find with one mask letter fail")

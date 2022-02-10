@@ -6,14 +6,14 @@ class TestFindArguments(DictionaryTestBase):
     def test_mask_argument(self):
         # Invalid mask
         with self.assertRaises(ValueError) as context:
-            self.dictionary._do_match_word('....', '', '.....')
+            self.dictionary._do_match_word('....', '', '.....', [])
 
         self.assertTrue('Mask must be 5 characters!' in str(context.exception))
 
     def test_mandatory_argument(self):
         # Invalid mandatory
         with self.assertRaises(ValueError) as context:
-            self.dictionary._do_match_word('.....', '', '....')
+            self.dictionary._do_match_word('.....', '', '....', [])
 
         self.assertTrue('Mandatory must be 5 characters!' in str(context.exception))
 
@@ -21,7 +21,7 @@ class TestFindArguments(DictionaryTestBase):
         # Both values are valid, but conflict.
         # Same position cannot have both mask and mandatory letter.
         with self.assertRaises(ValueError) as context:
-            self.dictionary._do_match_word('a....', '', 'e....')
+            self.dictionary._do_match_word('a....', '', 'e....', [])
 
         self.assertTrue('Mask and mandatory conflict at 0' in str(context.exception))
 
@@ -31,17 +31,10 @@ class TestFindArguments(DictionaryTestBase):
         # In this example we know letter 'e' is not the first letter of the word, but as we exclude it completely
         # there is no way of determining at which location it is at.
         expected_prime = ['ahven', 'asemo', 'bensa', 'bänet', 'heavy', 'hefta']
-        expected_words = ['aamen',
-                          'ameba',
-                          'asema',
-                          'asete',
-                          'aueta',
-                          'bebee',
-                          'beeta',
-                          'debet',
-                          'genre',
-                          'getto']
-        words, prime_words = self.dictionary._do_match_word(list('.....'), 'e', list('e....'))
+        expected_words = ['aamen', 'ameba', 'asema', 'asete',
+                          'aueta', 'bebee', 'beeta', 'debet',
+                          'genre', 'getto']
+        words, prime_words = self.dictionary._do_match_word(list('.....'), 'e', list('e....'), [])
         self.assertEqual(expected_words, words, "Excluded letters must not exist in mandatory ones!")
         self.assertEqual(expected_prime, prime_words, "Excluded letters must not exist in mandatory ones!")
 
@@ -51,6 +44,14 @@ class TestFindArguments(DictionaryTestBase):
         # Ref.: see test_one_mask_and_matching_exclude_letter()
         expected_prime = ['ehtyä', 'entäs', 'erota', 'estyä']
         expected_words = ['ehtoo', 'entää', 'eroon', 'estää', 'etana', 'etuus', 'evätä']
-        words, prime_words = self.dictionary._do_match_word(list('e....'), 'e', list('.....'))
+        words, prime_words = self.dictionary._do_match_word(list('e....'), 'e', list('.....'), [])
+        self.assertEqual(expected_words, words, "Find with one mask letter fail")
+        self.assertEqual(expected_prime, prime_words, "Find with one mask letter fail")
+
+    def test_invalid_words(self):
+        invalid_words = ['ehtyä', 'ehtoo']
+        expected_prime = ['entäs', 'erota', 'estyä']
+        expected_words = ['entää', 'eroon', 'estää', 'etana', 'etuus', 'evätä']
+        words, prime_words = self.dictionary._do_match_word(list('e....'), 'e', list('.....'), invalid_words)
         self.assertEqual(expected_words, words, "Find with one mask letter fail")
         self.assertEqual(expected_prime, prime_words, "Find with one mask letter fail")

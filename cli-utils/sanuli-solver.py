@@ -119,6 +119,8 @@ def _play_game(root_html: WebElement, board_element: WebElement, words: Dictiona
 
     # Go!
     next_action = ACTION_BAD_WORD
+    words_not_to_try = []
+    word = None
     while next_action not in [ACTION_NEW_SANULI, ACTION_GAME_FAILED]:
         current_row, board = _load_board(board_element)
         if current_row is None:
@@ -144,10 +146,11 @@ def _play_game(root_html: WebElement, board_element: WebElement, words: Dictiona
                     raise RuntimeError("Too many failures!")
 
                 fail_cnt += 1
-                word = words.match_word(green_letters, gray_letters, yellow_letters)
+                word = words.match_word(green_letters, gray_letters, yellow_letters, words_not_to_try)
                 next_action = _send_word(root_html, current_row, word)
-
-                time.sleep(1)
+                if next_action == ACTION_BAD_WORD:
+                    words_not_to_try.append(word)
+                    time.sleep(1)
 
     if next_action == ACTION_NEW_SANULI:
         log.info("Win! Word: {}".format(word))

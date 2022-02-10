@@ -20,7 +20,7 @@ class TestBugs(DictionaryTestBase):
     def test_incorrect_mandatory(self):
         self._setup_test_dictionary_1()
         expected_words = []
-        words, prime_words = self.dictionary._do_match_word(list("l.s.ä"), 'veoakysi', list(".ä..."))
+        words, prime_words = self.dictionary._do_match_word(list("l.s.ä"), 'veoakysi', list(".ä..."), [])
         self.assertEqual(expected_words, words, "Finding from given set fails")
         self.assertEqual(None, prime_words, "Finding from given set fails")
 
@@ -28,7 +28,7 @@ class TestBugs(DictionaryTestBase):
         self._setup_test_dictionary_1()
         expected_prime = ['läsnä']
         expected_words = []
-        words, prime_words = self.dictionary._do_match_word(list("l.s.ä"), 'veoakysi', list("...ä."))
+        words, prime_words = self.dictionary._do_match_word(list("l.s.ä"), 'veoakysi', list("...ä."), [])
         self.assertEqual(expected_words, words, "Finding from given set fails")
         self.assertEqual(expected_prime, prime_words, "Finding from given set fails")
 
@@ -46,7 +46,7 @@ class TestBugs(DictionaryTestBase):
         self._setup_test_dictionary_2()
         expected_prime = ['näppy']
         expected_words = []
-        words, prime_words = self.dictionary._do_match_word(list("n...."), 'eitourjaky', list(".y..ä"))
+        words, prime_words = self.dictionary._do_match_word(list("n...."), 'eitourjaky', list(".y..ä"), [])
         self.assertEqual(expected_words, words, "Finding from given set fails")
         self.assertEqual(expected_prime, prime_words, "Finding from given set fails")
 
@@ -67,6 +67,15 @@ class TestBugs(DictionaryTestBase):
         self._setup_test_dictionary_3()
         expected_prime = ['mukaa']
         expected_words = ['ammua']
-        words, prime_words = self.dictionary._do_match_word(list("....a"), 'trvepidl', list(".aum."))
+        words, prime_words = self.dictionary._do_match_word(list("....a"), 'trvepidl', list(".aum."), [])
+        self.assertEqual(expected_words, words, "Finding from given set fails")
+        self.assertEqual(expected_prime, prime_words, "Finding from given set fails")
+
+    def test_single_words_returned_invalid(self):
+        self._setup_test_dictionary_3()
+        invalid_words = ['mukaa']
+        expected_prime = ['ammua']
+        expected_words = []
+        words, prime_words = self.dictionary._do_match_word(list("....a"), 'trvepidl', list(".aum."), invalid_words)
         self.assertEqual(expected_words, words, "Finding from given set fails")
         self.assertEqual(expected_prime, prime_words, "Finding from given set fails")
