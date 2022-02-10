@@ -1,5 +1,5 @@
 # sanuli-konuli
-Solver for Finnish Wordly, Sanuli.
+Solver for Finnish Wordle, Sanuli.
 
 Code is generic and will work on any language. See class _KotusDictionary_
 on how Finnish dictionary is handled.
@@ -14,7 +14,7 @@ In Finnish language, they could be understood as very (annoyingly) naive way
 of sying "_sanakone_".
 
 All this originates from [Sanuli](https://sanuli.fi), whose author, Mr. J. Husso
-said his Wordly clone for Finnish language got this name from his colleague who
+said his Wordle clone for Finnish language got this name from his colleague who
 invented this name. "_The name was so annoying, I loved it immediately!_", he
 has been told to say for media regarding the chosen name.
 
@@ -129,7 +129,7 @@ optional arguments:
   --debug               Make logging use DEBUG instead of default INFO.
 ```
 
-# Example Wordly game:
+# Example Wordle game:
 TBD
 
 Lacking good English dictionary.
