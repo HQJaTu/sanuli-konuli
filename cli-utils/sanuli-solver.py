@@ -24,8 +24,9 @@ ACTION_BAD_WORD = 'B'
 ACTION_NEXT_WORD = 'N'
 ACTION_NEW_SANULI = 'W'
 ACTION_GAME_FAILED = 'F'
+DELAY_TO_INITIALIZE = 3
 DELAY_BETWEEN_WORDS = 0.2
-DELAY_BETWEEN_GAMES = 3
+DELAY_BETWEEN_GAMES = 1.5
 
 SANULI_URL = r"https://sanuli.fi/"
 log = logging.getLogger(__name__)
@@ -56,10 +57,12 @@ def automate_sanuli(words: Dictionary, firefox: str = None) -> None:
     games_played = 0
     while games_played < 300:
         games_played += 1
+        log.info("Playing game: #{0:3d}".format(games_played))
         _play_game(root_html, board_element, words)
 
         # New game after delay
         # Need to reload page to get more words
+        driver.get_screenshot_as_file('sanuli-won.png')
         time.sleep(DELAY_BETWEEN_GAMES)
         #driver.refresh()
         #board_element, root_html = _get_main_elements(driver)
@@ -67,9 +70,8 @@ def automate_sanuli(words: Dictionary, firefox: str = None) -> None:
 
 
 def _get_main_elements(driver) -> Tuple[WebElement, WebElement]:
-    delay = DELAY_BETWEEN_GAMES  # seconds
     try:
-        container = WebDriverWait(driver, delay).until(
+        container = WebDriverWait(driver, DELAY_TO_INITIALIZE).until(
             lambda x: x.find_element(By.XPATH, '//div[@class="board-container"]')
         )
         log.debug("Page is ready!")
