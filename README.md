@@ -115,7 +115,7 @@ usage: find-matching-word.py [-h] [--debug]
                              PROCESSED-WORDS-DAT-FILE MATCH-MASK
                              EXCLUDED-LETTERS [KNOWN-LETTERS]
 
-Match clues from Wordly/Sanuli with a dictionary
+Match clues from Wordle/Sanuli with a dictionary
 
 positional arguments:
   PROCESSED-WORDS-DAT-FILE
