@@ -30,10 +30,20 @@ class TestFindArguments(DictionaryTestBase):
         # Cannot exclude a mandatory letter.
         # In this example we know letter 'e' is not the first letter of the word, but as we exclude it completely
         # there is no way of determining at which location it is at.
-        with self.assertRaises(ValueError) as context:
-            self.dictionary._do_match_word(list('.....'), 'e', list('e....'))
-
-        self.assertTrue('Excluded letters must not exist in mandatory ones!' in str(context.exception))
+        expected_prime = ['ahven', 'asemo', 'bensa', 'bänet', 'heavy', 'hefta']
+        expected_words = ['aamen',
+                          'ameba',
+                          'asema',
+                          'asete',
+                          'aueta',
+                          'bebee',
+                          'beeta',
+                          'debet',
+                          'genre',
+                          'getto']
+        words, prime_words = self.dictionary._do_match_word(list('.....'), 'e', list('e....'))
+        self.assertEqual(expected_words, words, "Excluded letters must not exist in mandatory ones!")
+        self.assertEqual(expected_prime, prime_words, "Excluded letters must not exist in mandatory ones!")
 
     def test_conflicting_exclude_and_mask_arguments(self):
         # Both values are valid, conflict, but this is ok.

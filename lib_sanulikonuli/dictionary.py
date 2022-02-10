@@ -120,7 +120,9 @@ class Dictionary:
 
         excluded_letters = set(excluded)
         if set(mandatory_letters) & excluded_letters:
-            raise ValueError("Excluded letters must not exist in mandatory ones!")
+            # Remove conflicting mandatory letters from excluded ones to make this find succeed.
+            log.warning("Conflict in exclusion and mandatory. Removing conflicting from exclude.")
+            excluded_letters = excluded_letters - set(mandatory_letters)
 
         mask = ''.join([l if l else '.' for l in known_letters])
         mandatory = ''.join([l if l else '.' for l in mandatory_letters])
@@ -179,7 +181,9 @@ class Dictionary:
                 potential_words.append(word)
                 # print(word)
 
-        log.info("Found {} potential words with mask '{}'".format(len(potential_words), mask))
+        log.info("Found {} potential words with mask '{}' and exclusion '{}'".format(
+            len(potential_words), mask, ''.join(excluded)
+        ))
 
         # Reduce list further by adding mandatory letters we know are in the word, but we don't know where.
         # One important thing: We KNOW it is NOT in the given position.
