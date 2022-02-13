@@ -65,6 +65,12 @@ class Dictionary:
         else:
             initial_words = self._initial_words(unwanted_letters)
 
+        if not initial_words:
+            # Note: This can happen, but is ultra rare.
+            raise RuntimeError("Internal error! No initial words to choose from. "
+                               "Unwanted: '{}', Excluded: '{}'".format(
+                self.unwanted_initial_letters, excluded
+            ))
         initial = random.choice(initial_words)
 
         return initial

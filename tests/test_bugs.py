@@ -79,3 +79,25 @@ class TestBugs(DictionaryTestBase):
         words, prime_words = self.dictionary._do_match_word(list("....a"), 'trvepidl', list(".aum."), invalid_words)
         self.assertEqual(expected_words, words, "Finding from given set fails")
         self.assertEqual(expected_prime, prime_words, "Finding from given set fails")
+
+    def _setup_test_dictionary_4(self):
+        self.dictionary.words = [
+            'taiga', 'taiji', 'taika', 'taimi',
+            'taita', 'takia', 'teili', 'tiede',
+            'tiili', 'tiima', 'tiimi', 'tiira',
+            'tikka', 'tikki', 'tikli', 'tilhi',
+            'tilli', 'tippa', 'tippi', 'tirri',
+            'tiski', 'tissi', 'taide', 'taite',
+            'taive', 'tavis', 'teriö', 'tiera',
+            'tietä', 'tiheä', 'tilde', 'tilke',
+            'tilsa', 'tisle', 'trial', 'tyriä',
+        ]
+
+    def test_too_limiting_criteria(self):
+        self._setup_test_dictionary_3()
+        invalid_words = []
+        expected_prime = None
+        expected_words = []
+        words, prime_words = self.dictionary._do_match_word(list("ti..."), 'uonheäir', list("....a"), invalid_words)
+        self.assertEqual(expected_words, words, "Finding from given set fails")
+        self.assertEqual(expected_prime, prime_words, "Finding from given set fails")
