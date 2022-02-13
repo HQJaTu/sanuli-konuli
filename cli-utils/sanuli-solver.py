@@ -6,6 +6,7 @@ import os
 import sys
 import argparse
 import logging
+from datetime import datetime
 from typing import Tuple
 from selenium import webdriver, common
 from selenium.webdriver.common.by import By
@@ -27,6 +28,7 @@ ACTION_GAME_FAILED = 'F'
 DELAY_TO_INITIALIZE = 3
 DELAY_BETWEEN_WORDS = 0.2
 DELAY_BETWEEN_GAMES = 1.5
+DELAY_AT_FAILURE = 15
 
 SANULI_URL = r"https://sanuli.fi/"
 log = logging.getLogger(__name__)
@@ -45,28 +47,44 @@ def _setup_logger(use_debug: bool) -> None:
         log.setLevel(logging.INFO)
 
     selenium_log = logging.getLogger("selenium.webdriver.remote")
-    log.setLevel(logging.INFO)
+    selenium_log.setLevel(logging.INFO)
 
 
-def automate_sanuli(words: Dictionary, firefox: str = None) -> None:
-    driver = _get_firefox(firefox)
+def automate_sanuli(words: Dictionary, firefox: str = None, safari: bool = None) -> None:
+    if firefox:
+        driver = _get_firefox(firefox)
+    elif safari:
+        driver = _get_safari()
+    else:
+        raise ValueError("Which driver?")
+
+    # Go automate
+    driver.set_window_size(900, 800)
     driver.get(SANULI_URL)
 
     board_element, root_html = _get_main_elements(driver)
 
+    good_to_go = True
     games_played = 0
-    while games_played < 300:
+    while games_played < 300 and good_to_go:
         games_played += 1
         log.info("Playing game: #{0:3d}".format(games_played))
-        _play_game(root_html, board_element, words)
+        good_to_go = _play_game(root_html, board_element, words)
 
-        # New game after delay
-        # Need to reload page to get more words
-        driver.get_screenshot_as_file('sanuli-won.png')
-        time.sleep(DELAY_BETWEEN_GAMES)
-        #driver.refresh()
-        #board_element, root_html = _get_main_elements(driver)
-        root_html.send_keys(webdriver.common.keys.Keys.RETURN)
+        if good_to_go:
+            # New game after delay
+            # Need to reload page to get more words
+            driver.get_screenshot_as_file('sanuli-won.png')
+            time.sleep(DELAY_BETWEEN_GAMES)
+            # driver.refresh()
+            # board_element, root_html = _get_main_elements(driver)
+            root_html.send_keys(webdriver.common.keys.Keys.RETURN)
+        else:
+            now_is = datetime.now().strftime("%Y%m%d-%H%M")
+            driver.get_screenshot_as_file('sanuli-gameover-{}.png'.format(now_is))
+            if safari:
+                # Safari browser window closes on driver destruct
+                time.sleep(DELAY_AT_FAILURE)
 
 
 def _get_main_elements(driver) -> Tuple[WebElement, WebElement]:
@@ -97,7 +115,14 @@ def _get_main_elements(driver) -> Tuple[WebElement, WebElement]:
     return board_element, root_html
 
 
-def _play_game(root_html: WebElement, board_element: WebElement, words: Dictionary):
+def _play_game(root_html: WebElement, board_element: WebElement, words: Dictionary) -> bool:
+    """
+
+    :param root_html:
+    :param board_element:
+    :param words:
+    :return: bool, True = good to go for next word, False = failed
+    """
     fail_cnt = 0
 
     def _do_initial_round(current_row: int, bad_letters: str = None) -> str:
@@ -155,9 +180,9 @@ def _play_game(root_html: WebElement, board_element: WebElement, words: Dictiona
     if next_action == ACTION_NEW_SANULI:
         log.info("Win! Word: {}".format(word))
 
-        return
+        return True
 
-    raise RuntimeError("Game over")
+    return False
 
 
 def _get_matches(board: list) -> Tuple[str, str]:
@@ -207,10 +232,11 @@ def _send_word(key_receiver_element: WebElement, game_row: int, word: str) -> st
     # Evaluate if this word was accepted
     message = key_receiver_element.find_element(By.XPATH, './/div[@class="message"]')
     if message and message.text:
-        if message.text.startswith('LÖYSIT SANAN!'):
+        log.debug("There is a message. Text: '{}'".format(message.text))
+        if message.text.lower().startswith('löysit sanan'):
             return ACTION_NEW_SANULI
 
-        if message.text.startswith('EI SANULISTALLA.'):
+        if message.text.lower().startswith('ei sanulistalla.'):
             log.warning("Bad word: {}".format(word))
 
             time.sleep(1)
@@ -220,7 +246,7 @@ def _send_word(key_receiver_element: WebElement, game_row: int, word: str) -> st
 
             return ACTION_BAD_WORD
 
-        if message.text.startswith('SANA OLI "'):
+        if message.text.lower().startswith('sana oli "'):
             log.warning("Game failed!")
 
             return ACTION_GAME_FAILED
@@ -301,12 +327,20 @@ def _get_firefox(geckodriver_path: str) -> webdriver.remote.webdriver.WebDriver:
     return driver
 
 
+def _get_safari() -> webdriver.remote.webdriver.WebDriver:
+    driver = webdriver.Safari()
+
+    return driver
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description='Automated Sanuli.fi solver')
     parser.add_argument('words_file', metavar="PROCESSED-WORDS-DAT-FILE",
                         help="Processed 5-letter words file.")
     parser.add_argument('--firefox-gecko-driver-path',
                         help="If using Firefox as the browser, downloaded geckodriver-binary")
+    parser.add_argument('--use-safari-driver', action="store_true",
+                        help="If using Safari as the browser")
     parser.add_argument('--debug', action="store_true", default=False,
                         help="Make logging use DEBUG instead of default INFO.")
 
@@ -320,7 +354,14 @@ def main() -> None:
     log.info("Load pre-saved words from {}".format(args.words_file))
     words = Dictionary()
     words.load_words(args.words_file)
-    automate_sanuli(words, firefox=args.firefox_gecko_driver_path)
+    if args.firefox_gecko_driver_path:
+        automate_sanuli(words, firefox=args.firefox_gecko_driver_path)
+    elif args.use_safari_driver:
+        automate_sanuli(words, safari=True)
+    else:
+        log.error("Need browser-driver path!")
+        exit(2)
+
     log.info("Done.")
 
 
