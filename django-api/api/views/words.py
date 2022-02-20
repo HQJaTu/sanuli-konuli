@@ -64,6 +64,8 @@ class API(APIView):
             del kwargs["version"]
         if version == 1:
             api = APIv1(request=request)
+            if "excluded" in request.query_params:
+                kwargs["excluded"] = request.query_params["excluded"]
             return api.get_initial(request, *args, **kwargs)
 
         raise ValueError("Unknown version!")
