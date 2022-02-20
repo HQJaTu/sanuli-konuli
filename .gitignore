@@ -1,5 +1,7 @@
 words/
 venv*
+*.sqlite3
+.DS_Store
 
 # Selenium
 selenium-binaries/
