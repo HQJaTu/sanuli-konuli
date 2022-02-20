@@ -1,5 +1,5 @@
 # Sanuli-Konuli API
-tbd
+Expose the Sanuli-Konuli solver machinery via REST API.
 
 # Tricks
 
