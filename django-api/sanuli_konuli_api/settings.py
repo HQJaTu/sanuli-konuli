@@ -42,8 +42,20 @@ ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-owyorkj(lw@)p@ek0urs_nily*4@$%wm$dl6#3a4r(^_%w$=kz'
+# If a secret key was not supplied elsewhere, generate a random one and log
+# a warning (note that logging is not configured yet). This means that any
+# functionality expecting SECRET_KEY to stay same will break upon restart.
+# Should not be a problem for development.
+if "SECRET_KEY" not in locals():
+    import random
+
+    system_random = random.SystemRandom()
+    SECRET_KEY = "".join(
+        [
+            system_random.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)")
+            for i in range(64)
+        ]
+    )
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
