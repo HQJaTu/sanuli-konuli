@@ -171,7 +171,7 @@ def _play_game(root_html: WebElement, board_element: WebElement, words: Dictiona
                     raise RuntimeError("Too many failures!")
 
                 fail_cnt += 1
-                word = words.match_word(green_letters, gray_letters, yellow_letters, words_not_to_try)
+                word, _, _ = words.match_word(green_letters, gray_letters, yellow_letters, words_not_to_try)
                 next_action = _send_word(root_html, current_row, word)
                 if next_action == ACTION_BAD_WORD:
                     words_not_to_try.append(word)
@@ -230,13 +230,14 @@ def _send_word(key_receiver_element: WebElement, game_row: int, word: str) -> st
     key_receiver_element.send_keys(webdriver.common.keys.Keys.RETURN)
 
     # Evaluate if this word was accepted
-    message = key_receiver_element.find_element(By.XPATH, './/div[@class="message"]')
-    if message and message.text:
-        log.debug("There is a message. Text: '{}'".format(message.text))
-        if message.text.lower().startswith('löysit sanan'):
+    message = key_receiver_element.find_elements(By.XPATH, './/div[@class="message"]')
+    if message and message[0].text:
+        message_text = message[0].text
+        log.debug("There is a message. Text: '{}'".format(message_text))
+        if message_text.lower().startswith('löysit sanan'):
             return ACTION_NEW_SANULI
 
-        if message.text.lower().startswith('ei sanulistalla.'):
+        if message_text.lower().startswith('ei sanulistalla.'):
             log.warning("Bad word: {}".format(word))
 
             time.sleep(1)
@@ -246,13 +247,13 @@ def _send_word(key_receiver_element: WebElement, game_row: int, word: str) -> st
 
             return ACTION_BAD_WORD
 
-        if message.text.lower().startswith('sana oli "'):
+        if message_text.lower().startswith('sana oli "'):
             log.warning("Game failed!")
 
             return ACTION_GAME_FAILED
 
         # Unknown text
-        log.warning("Message: {}".format(message.text))
+        log.warning("Internal: Unhandled message: {}".format(message_text))
 
     return ACTION_NEXT_WORD
 

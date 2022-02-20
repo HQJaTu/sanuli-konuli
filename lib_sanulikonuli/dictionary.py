@@ -95,7 +95,7 @@ class Dictionary:
         return initial_words
 
     def match_word(self, word_mask: str, excluded_letters: str, mandatory_mask: str,
-                   invalid_words: list = None) -> Union[str, None]:
+                   invalid_words: list = None, print_list: bool = True) -> Tuple[Union[str, None], list, list]:
         known_letters = list(word_mask.lower())
         excluded_letters = list(excluded_letters)
         mandatory_letters = list(mandatory_mask.lower())
@@ -106,21 +106,23 @@ class Dictionary:
         if not matching_words and not prime_words:
             log.warning("No words matched!")
 
-            return None
+            return None, [], []
 
         random_word = None
         if matching_words:
-            for word in matching_words:
-                print("{} {}".format(" ", word))
+            if print_list:
+                for word in matching_words:
+                    print("{} {}".format(" ", word))
             random_word = random.choice(matching_words)
         if prime_words:
-            for word in prime_words:
-                print("{} {}".format("P", word))
+            if print_list:
+                for word in prime_words:
+                    print("{} {}".format("P", word))
             random_word = random.choice(prime_words)
 
         log.info("Random word is: {}".format(random_word))
 
-        return random_word
+        return random_word, prime_words, matching_words
 
     def _do_match_word(self, known_letters: list, excluded: list, mandatory_letters: list,
                        invalid_words: list) -> Tuple[list, list]:
