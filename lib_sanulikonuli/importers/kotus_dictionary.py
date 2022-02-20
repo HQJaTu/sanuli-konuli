@@ -34,3 +34,16 @@ class KotusDictionary(Dictionary):
         log.debug("Added {} words".format(len(self.words)))
 
         return self.words
+
+    def add_word(self, word_to_add: str) -> None:
+        if len(word_to_add) != self.word_len:
+            raise ValueError("Word '{}' doesn't match length of {}!".format(word_to_add, self.word_len))
+
+        alphabet = set(list(self.alphabet))
+        characters = set(list(word_to_add.lower()))
+        if characters - alphabet:
+            # Not all characters are in alphabet. Skip this.
+            raise ValueError("Word '{}' doesn't match alphabet of this dictionary!".format(word_to_add))
+
+        self.words.append(word_to_add.lower())
+        log.debug("{}-letter word: {}".format(self.word_len, word_to_add))
