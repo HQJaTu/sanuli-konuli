@@ -37,7 +37,6 @@ setup(
         'lxml==4.7.1',
     ],
     scripts=['cli-utils/find-matching-word.py',
-             'cli-utils/get-initial-word.py',
-             'cli-utils/kotus-5-letter-words.py'],
+             'cli-utils/get-initial-word.py'],
     packages=find_packages()
 )
