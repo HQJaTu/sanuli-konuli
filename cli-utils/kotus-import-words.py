@@ -33,7 +33,8 @@ def main() -> None:
     parser.add_argument('number_of_letters', metavar="WORD-LENGTH", type=int,
                         help="Number of letters to import from wordlist")
     parser.add_argument('add_word', metavar="ADD-WORD-TO-DICTIONARY", nargs="*", default=None,
-                        help="Add a matching word to dictionary. Can have any number of these.")
+                        help="Add a word to dictionary. Must meet dictionary word length and alphabet. "
+                             "Can have any number of these.")
     parser.add_argument('--output-file', default=KOTUS_WORDFILE,
                         help="Processed wordlist file. Default: {}".format(KOTUS_WORDFILE))
     parser.add_argument('--debug', action="store_true", default=False,

@@ -36,6 +36,7 @@ extract words from it and save all matching words having no special characters.
 ```bash
 usage: kotus-import-words.py [-h] [--output-file OUTPUT_FILE] [--debug]
                              KOTUS-SANALISTA-V1-XML-FILE WORD-LENGTH
+                             [ADD-WORD-TO-DICTIONARY ...]
 
 Kotus word-list converter
 
@@ -43,12 +44,14 @@ positional arguments:
   KOTUS-SANALISTA-V1-XML-FILE
                         Finnish wordlist
   WORD-LENGTH           Number of letters to import from wordlist
+  ADD-WORD-TO-DICTIONARY
+                        Add a word to dictionary. Must meet dictionary word length and
+                        alphabet. Can have any number of these.
 
 optional arguments:
   -h, --help            show this help message and exit
   --output-file OUTPUT_FILE
-                        Processed wordlist file. Default: kotus-
-                        sanalista_v1.dat
+                        Processed wordlist file. Default: kotus-sanalista_v1.dat
   --debug               Make logging use DEBUG instead of default INFO.
 ```
 
