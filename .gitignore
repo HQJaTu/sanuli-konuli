@@ -2,6 +2,8 @@ words/
 venv*
 *.sqlite3
 .DS_Store
+django-api/config.env
+django-api/local-Dockerfile
 
 # Selenium
 selenium-binaries/

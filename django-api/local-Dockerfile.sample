@@ -1,0 +1,4 @@
+FROM docker.io/kingjatu/sanuli-konuli:latest
+
+COPY django-api/db.sqlite3 sanuli-konuli/django-api/db.sqlite3
+RUN echo "DICTIONARIES=fi:5:words/kotus-sanalista-5-words_v1.dat,fi:6:words/kotus-sanalista-6-words_v1.dat,en:5:words/nltk-wordnet2021-5-words_v1.dat" > sanuli-konuli/django-api/config.env

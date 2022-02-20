@@ -29,7 +29,7 @@ env = environ.Env(
 
 # Django environ has a nasty habit of complaining at level
 # WARN about env file not being preset. Here we pre-empt it.
-CONFIG_FILE_NAME = "config_dev.env"
+CONFIG_FILE_NAME = "config.env"
 env_file_path = os.path.join(BASE_DIR, CONFIG_FILE_NAME)
 if os.path.exists(env_file_path):
     # Logging configuration is not available at this point
