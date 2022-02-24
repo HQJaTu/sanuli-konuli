@@ -8,13 +8,13 @@ konuli_dynamicallyLoadScript = (url) => {
 
 konuli_init = () => {
     // Move board to left a bit to make room for our solver
-    const board = $(".board-6");
+    const board = $(".board-6:last");
     board.css("left", "30%");
 
     // Introduce the new div
     const konuliDiv = `
 <div style="position:absolute; display:grid; left:55%; width:290px;color:white;">
-  <h3>Sanuli-Konuli</h3>
+  <h3>Sanuli-Konuli<button onclick="javascript:konuli_game_round();">R</button></h3>
   <div id="konuli-words" style="overflow-y:scroll; height:420px;position: relative;width: 150px;"></div>
 </div>
 `.trim()
@@ -45,7 +45,8 @@ konuli_determine_state = () => {
     const msg = konuli_get_message();
 
     if (msg) {
-        if (msg.startsWith("Löysit sanan!")) {
+        if (msg.startsWith("Löysit sanan!") || msg.startsWith("Löysit päivän sanulin")) {
+            $("#konuli-words").empty();
             console.log("Konuli: Sanuli solved!");
 
             return null;
@@ -71,20 +72,22 @@ konuli_determine_state = () => {
 
     // Determine current row and collect game status.
     const current_row = current_tiles[0].parentNode;
-    const board = $(".board-6");
+    const board = $(".board-6:last");
     let row_idx = null;
     let row_div = true;
     let prev_row_div = null;
+    let row_matched = false;
     for (row_idx = 0; row_div; ++row_idx) {
-        row_div = board.children()[row_idx];
+        row_div = board[0].childNodes[row_idx];
         if (row_div && row_div === current_row) {
+            row_matched = true;
             console.log(`Konuli current row: ${row_idx}`)
 
             break;
         }
         prev_row_div = $(row_div);
     }
-    if (row_idx === null) {
+    if (!row_matched) {
         console.log("Konuli internal error: Confusion! Current row cannot be matched.")
 
         return null;
@@ -208,10 +211,10 @@ konuli_add_word = (word) => {
         let event_params;
         // NOTE: Need to dispatch browser native event!
         if (key === String.fromCharCode(13)) {
-            console.log(`Konuli send: Enter`)
+            //console.log(`Konuli send: Enter`)
             event_params = {'key': 'Enter', 'keyCode': 13};
         } else {
-            console.log(`Konuli send: ${key}`)
+            //console.log(`Konuli send: ${key}`)
             event_params = {'key': key.toUpperCase()};
         }
 
