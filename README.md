@@ -187,6 +187,16 @@ cd sanuli-konuli
 pip install .
 ```
 
+# API
+
+See directory `django-api/` for REST API version of the solver.
+
+## Sanuli-Konuli - JavaScript-edition
+
+Use case for API: Injectable JavaScript-code to do some Sanuli solving.
+
+Credit for JS-injection: https://vr.aarre.net/
+
 # Development
 
 ## Running local dev

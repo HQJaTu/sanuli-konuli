@@ -1,0 +1,1 @@
+const s_url='http://127.0.0.1:8000',s_key='0Jm9mplFXpCBskehjICjq92WmfE7Pb6fkpUKmnej',s_lang='fi',s_wl=5;(function(d){const s = d.createElement('script');s.src=`${s_url}/js/sanuli-konuli.js?D=`+(new Date()).getTime();d.head.appendChild(s)})(document)

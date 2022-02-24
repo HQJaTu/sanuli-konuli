@@ -97,7 +97,7 @@ class Dictionary:
     def match_word(self, word_mask: str, excluded_letters: str, mandatory_mask: str,
                    invalid_words: list = None, print_list: bool = True) -> Tuple[Union[str, None], list, list]:
         known_letters = list(word_mask.lower())
-        excluded_letters = list(excluded_letters)
+        excluded_letters = list(excluded_letters.lower())
         mandatory_letters = list(mandatory_mask.lower())
         if not invalid_words:
             invalid_words = []

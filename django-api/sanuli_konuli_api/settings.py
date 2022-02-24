@@ -76,11 +76,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Added Django libs:
     "rest_framework",
+    'corsheaders', # pip install django-cors-headers
     "django_extensions",  # pip install django-extensions
     "drf_spectacular",  # pip install drf-spectacular
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -150,6 +152,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+import mimetypes
+mimetypes.add_type("text/css", ".css", True)
+mimetypes.add_type("text/javascript", ".js", True)
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r'^https:\/\/sanuli.fi$',
+]
+CORS_ORIGIN_WHITELIST = (
+    'https://sanuli.fi',
+)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

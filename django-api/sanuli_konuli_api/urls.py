@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
+from django.conf.urls.static import static
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
@@ -24,7 +25,8 @@ from api import urls as api_urls
 
 urlpatterns = [
 #    path('admin/', admin.site.urls),
-    path("api/", include((api_urls.urlpatterns, "facta"))),
+    path("api/", include((api_urls.urlpatterns, "api"))),
+
     # OpenAPI 3 documentation with Swagger UI:
     re_path(
         r"^schema/v(?P<version>(\d+))/", SpectacularAPIView.as_view(), name="schema"
@@ -39,4 +41,4 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
-]
+] + static('js', document_root="js/") # Serve our custom JavaScript-files
