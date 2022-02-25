@@ -13,7 +13,7 @@ konuli_init = () => {
 
     // Introduce the new div
     const konuliDiv = `
-<div style="position:absolute; display:grid; left:55%; width:290px;color:white;">
+<div style="position:absolute;display:grid;left: 60%;width:290px;color:white;margin-left: -20px;">
   <h3>Sanuli-Konuli<button onclick="javascript:konuli_game_round();">R</button></h3>
   <div id="konuli-words" style="overflow-y:scroll; height:420px;position: relative;width: 150px;"></div>
 </div>
