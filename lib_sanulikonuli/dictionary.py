@@ -55,7 +55,7 @@ class Dictionary:
     def select_random_initial_word(self, excluded: str = None) -> str:
         unwanted_letters = list(self.unwanted_initial_letters)
         if excluded:
-            excluded_letters = list(excluded)
+            excluded_letters = list(excluded.lower())
             attempt = unwanted_letters.copy()
             attempt.extend(excluded_letters)
             initial_words = self._initial_words(attempt)
