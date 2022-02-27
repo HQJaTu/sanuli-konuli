@@ -57,6 +57,11 @@ konuli_determine_state = () => {
         } else if (msg.startsWith("Ei sanulistalla.")) {
             console.log("Konuli: Bad word.")
 
+            // Wait a second, then erase.
+            konuli_delay(() => {
+                konuli_clear_word()
+            }, 1000)();
+
             return false;
         }
 
@@ -243,6 +248,15 @@ konuli_add_word = (word) => {
     }, 200)();
 
     return false;
+}
+
+konuli_clear_word = () => {
+    const event_params = {'key': 'Backspace', 'keyCode': 8};
+    for (let idx=0; idx < konuli_word_length; ++idx) {
+        konuli_delay(() => {
+            window.dispatchEvent(new KeyboardEvent('keydown', event_params));
+        }, 10)();
+    }
 }
 
 konuli_delay = (fn, ms) => {
