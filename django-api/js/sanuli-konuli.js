@@ -17,7 +17,11 @@ konuli_init = () => {
     // Introduce the new div
     const konuliDiv = `
 <div style="position:absolute;display:grid;left: 60%;width:290px;color:white;margin-left: -20px;">
-  <h3>Sanuli-Konuli<button onclick="javascript:konuli_game_round();">R</button></h3>
+  <h3>Sanuli-Konuli
+    <div style="margin-top:50px;position: relative;display: inline-block;">
+      <img src="${s_url}/js/refresh-svgrepo-com-32px.png" style="position: absolute;top: -25px;cursor: pointer;" onclick="javascript:konuli_game_round();">
+    </div>
+  </h3>
   <div id="konuli-words" style="overflow-y:scroll; height:420px;position: relative;width: 150px;"></div>
 </div>
 `.trim()
@@ -252,7 +256,7 @@ konuli_add_word = (word) => {
 
 konuli_clear_word = () => {
     const event_params = {'key': 'Backspace', 'keyCode': 8};
-    for (let idx=0; idx < konuli_word_length; ++idx) {
+    for (let idx = 0; idx < konuli_word_length; ++idx) {
         konuli_delay(() => {
             window.dispatchEvent(new KeyboardEvent('keydown', event_params));
         }, 10)();
