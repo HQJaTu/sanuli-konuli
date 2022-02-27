@@ -35,6 +35,8 @@ def main() -> None:
     parser.add_argument('add_word', metavar="ADD-WORD-TO-DICTIONARY", nargs="*", default=None,
                         help="Add a word to dictionary. Must meet dictionary word length and alphabet. "
                              "Can have any number of these.")
+    parser.add_argument('--additional-words-file',
+                        help="Add words to dictionary from file. Words one per line.")
     parser.add_argument('--output-file', default=KOTUS_WORDFILE,
                         help="Processed wordlist file. Default: {}".format(KOTUS_WORDFILE))
     parser.add_argument('--debug', action="store_true", default=False,
@@ -53,6 +55,13 @@ def main() -> None:
     if args.add_word:
         for word in args.add_word:
             words.add_word(word)
+    if args.additional_words_file:
+        with open(args.additional_words_file, "rt") as word_file:
+            for word in word_file:
+                word = word.strip()
+                if not word:
+                    continue
+                words.add_word(word)
     words.save_words(args.output_file)
     log.info("Done.")
 
