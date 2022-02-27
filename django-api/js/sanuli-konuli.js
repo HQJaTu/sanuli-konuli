@@ -1,3 +1,6 @@
+let konuli_word_length = null;
+let konuli_waiting_for_board = false;
+
 konuli_dynamicallyLoadScript = (url) => {
     var script = document.createElement("script");  // create a script DOM node
     script.src = url;  // set its src to the provided URL
@@ -47,6 +50,7 @@ konuli_determine_state = () => {
     if (msg) {
         if (msg.startsWith("Löysit sanan!") || msg.startsWith("Löysit päivän sanulin")) {
             $("#konuli-words").empty();
+            konuli_waiting_for_board = true;
             console.log("Konuli: Sanuli solved!");
 
             return null;
@@ -72,6 +76,7 @@ konuli_determine_state = () => {
 
     // Determine current row and collect game status.
     const current_row = current_tiles[0].parentNode;
+    konuli_word_length = current_row.childElementCount;
     const board = $(".board-6:last");
     let row_idx = null;
     let row_div = true;
@@ -146,7 +151,7 @@ konuli_get_message = () => {
 konuli_get_initial_word = () => {
     // Docs: https://api.jquery.com/jQuery.ajax/
     $.ajax({
-        url: `${s_url}/api/v1/words/${s_lang}-${s_wl}`,
+        url: `${s_url}/api/v1/words/${s_lang}-${konuli_word_length}`,
         headers: {
             "Authorization": `Token ${s_key}`
         },
@@ -168,7 +173,7 @@ ${resp['word']} <button onclick="javascript:return konuli_add_word('${resp['word
 konuli_match_word = (greens, grays, yellows) => {
     // Docs: https://api.jquery.com/jQuery.ajax/
     $.ajax({
-        url: `${s_url}/api/v1/words/${s_lang}-${s_wl}`,
+        url: `${s_url}/api/v1/words/${s_lang}-${konuli_word_length}`,
         headers: {
             "Authorization": `Token ${s_key}`
         },
@@ -186,6 +191,16 @@ konuli_match_word = (greens, grays, yellows) => {
 
 konuli_show_matching_words = (resp) => {
     const word_list = $("#konuli-words");
+    if (!resp["found_matches"]) {
+        let word_html = `
+<p>Sanastossa ei sopivia sanoja!</p>
+`;
+        word_list.empty();
+        word_list.html(word_html);
+
+        return
+    }
+
     const chosen_word = resp['word'];
     let word_html = `
 ${chosen_word} <button onclick="javascript:return konuli_add_word('${chosen_word}');">Lisää</button><br/>
