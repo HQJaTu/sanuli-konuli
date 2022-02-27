@@ -37,8 +37,8 @@ konuli_game_round = () => {
     if (Array.isArray(state)) {
         konuli_retries = null;
         const [row_idx, greens, grays, yellows] = state;
-        if (row_idx === 0) {
-            konuli_get_initial_word();
+        if (row_idx === 0 || (greens === null && yellows === null)) {
+            konuli_get_initial_word(grays);
         } else {
             if (!greens && !yellows) {
                 // Oh! Initial has nothing.
@@ -162,9 +162,11 @@ konuli_determine_state = () => {
     // Get greens from previous row
     const prev_row_tiles = prev_row_div.find(".tile");
     let greens = '';
+    let green_cnt = 0;
     prev_row_tiles.each((idx, elem) => {
         if ($(elem).hasClass("correct")) {
             greens += elem.textContent;
+            ++green_cnt;
         } else {
             greens += ".";
         }
@@ -173,14 +175,21 @@ konuli_determine_state = () => {
 
     // Get yellows from previous row
     let yellows = '';
+    let yellow_cnt = 0;
     prev_row_tiles.each((idx, elem) => {
         if ($(elem).hasClass("present")) {
             yellows += elem.textContent;
+            ++yellow_cnt;
         } else {
             yellows += ".";
         }
     });
     console.log(`Konuli debug: yellows: "${yellows}"`)
+
+    if (!green_cnt && !yellow_cnt) {
+        greens = null;
+        yellows = null;
+    }
 
     return [row_idx, greens, grays, yellows];
 }
@@ -194,10 +203,14 @@ konuli_get_message = () => {
     return message[0].innerHTML;
 }
 
-konuli_get_initial_word = () => {
+konuli_get_initial_word = (grays) => {
     // Docs: https://api.jquery.com/jQuery.ajax/
+    let url = `${s_url}/api/v1/words/${s_lang}-${konuli_word_length}`;
+    if (grays !== null) {
+        url += `?excluded=${grays}`
+    }
     $.ajax({
-        url: `${s_url}/api/v1/words/${s_lang}-${konuli_word_length}`,
+        url: url,
         headers: {
             "Authorization": `Token ${s_key}`
         },
