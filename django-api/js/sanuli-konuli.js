@@ -48,7 +48,7 @@ konuli_game_round = () => {
             }
         }
     } else if (typeof state == "boolean") {
-        if (state) {
+        if (konuli_waiting_for_board) {
             // If game is solved, poll once a second to see if user
             let delay = 1000;
             if (konuli_retries === null) {
@@ -94,6 +94,13 @@ konuli_determine_state = () => {
             konuli_delay(() => {
                 konuli_clear_word()
             }, 1000)();
+
+            return false;
+        } else if (msg.startsWith("Sana oli ")) {
+            if (!konuli_waiting_for_board) {
+                console.log("Konuli: Game over - failed")
+            }
+            konuli_waiting_for_board = true;
 
             return false;
         }
@@ -244,12 +251,22 @@ konuli_show_matching_words = (resp) => {
     let word_html = `
 ${chosen_word} <button onclick="javascript:return konuli_add_word('${chosen_word}');">Lisää</button><br/>
 `;
-    for (let idx in resp['prime_words']) {
-        const word = resp['prime_words'][idx];
+    for (let idx in resp['other_words']) {
+        const word = resp['other_words'][idx];
         if (word !== chosen_word) {
             word_html += `
 ${word} <button onclick="javascript:return konuli_add_word('${word}');">Lisää</button><br/>
 `;
+        }
+    }
+    if (resp['prime_words'].length < 10) {
+        for (let idx in resp['prime_words']) {
+            const word = resp['prime_words'][idx];
+            if (word !== chosen_word) {
+                word_html += `
+${word} <button onclick="javascript:return konuli_add_word('${word}');">Lisää</button><br/>
+`;
+            }
         }
     }
     word_list.empty();
