@@ -49,6 +49,11 @@ class API(APIView):
         word_length = int(word_length)
         words = DictionaryLoader.load(lang, word_length)
         word, prime, other = words.match_word(req["match_mask"], req["excluded_letters"], req["known_letters"])
+        if word:
+            has_matches = True
+        else:
+            word = ''
+            has_matches = False
         if not prime:
             prime = []
         if not other:
@@ -56,6 +61,7 @@ class API(APIView):
         log.info("Done matching.")
 
         word_data = {
+            "found_matches": has_matches,
             "word": word,
             "prime_words": prime,
             "other_words": other

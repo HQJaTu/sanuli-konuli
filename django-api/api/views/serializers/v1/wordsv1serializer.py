@@ -7,6 +7,11 @@ from .wordv1serializer import WordV1Serializer
     examples=[]
 )
 class WordsV1Serializer(serializers.Serializer):
-    word = serializers.CharField(max_length=10, allow_null=False)
-    prime_words = serializers.ListSerializer(child=serializers.CharField(max_length=10, allow_null=False))
-    other_words = serializers.ListSerializer(child=serializers.CharField(max_length=10, allow_null=False))
+    found_matches = serializers.BooleanField(allow_null=False)
+    word = serializers.CharField(max_length=10, allow_null=False, allow_blank=True)
+    prime_words = serializers.ListSerializer(
+        child=serializers.CharField(max_length=10, allow_null=False, allow_blank=False)
+    )
+    other_words = serializers.ListSerializer(
+        child=serializers.CharField(max_length=10, allow_null=False, allow_blank=False)
+    )
