@@ -1,5 +1,6 @@
 let konuli_word_length = null;
 let konuli_waiting_for_board = false;
+let konuli_retries = null;
 
 konuli_dynamicallyLoadScript = (url) => {
     var script = document.createElement("script");  // create a script DOM node
@@ -34,6 +35,7 @@ konuli_init = () => {
 konuli_game_round = () => {
     const state = konuli_determine_state();
     if (Array.isArray(state)) {
+        konuli_retries = null;
         const [row_idx, greens, grays, yellows] = state;
         if (row_idx === 0) {
             konuli_get_initial_word();
@@ -45,19 +47,46 @@ konuli_game_round = () => {
                 konuli_match_word(greens, grays, yellows);
             }
         }
+    } else if (typeof state == "boolean") {
+        if (state) {
+            // If game is solved, poll once a second to see if user
+            let delay = 1000;
+            if (konuli_retries === null) {
+                konuli_retries = 0;
+            } else {
+                ++konuli_retries;
+                if (konuli_retries > 30) {
+                    // 30 seconds have passed, relax a lot
+                    delay = 60000; // minute
+                }
+            }
+            //console.log(`Retry: ${konuli_retries} Konuli waiting for user to go for a new game`)
+            konuli_delay(() => {
+                konuli_game_round()
+            }, delay)();
+        }
     }
 }
 
 konuli_determine_state = () => {
+    /*
+    * Return values:
+    * - null: error
+    * - true: solved
+    * - false: bad word
+    * - array: [current row index 0-5, greens, grays, yellows]
+    */
     const msg = konuli_get_message();
 
     if (msg) {
         if (msg.startsWith("Löysit sanan!") || msg.startsWith("Löysit päivän sanulin")) {
             $("#konuli-words").empty();
+            if (!konuli_waiting_for_board) {
+                console.log("Konuli: Sanuli solved!");
+            }
             konuli_waiting_for_board = true;
-            console.log("Konuli: Sanuli solved!");
 
-            return null;
+            return true;
         } else if (msg.startsWith("Ei sanulistalla.")) {
             console.log("Konuli: Bad word.")
 
@@ -76,6 +105,7 @@ konuli_determine_state = () => {
 
     // Ok. Seems good to go.
     // Find current row number.
+    konuli_waiting_for_board = false;
     const current_tiles = $(".tile.current");
     if (!current_tiles) {
         console.log("Konuli internal error: Confusion! Current row missing.")
