@@ -4,6 +4,7 @@ venv*
 .DS_Store
 django-api/config.env
 django-api/local-Dockerfile
+django-api/js/loader.js
 
 # Selenium
 selenium-binaries/

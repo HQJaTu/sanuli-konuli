@@ -1,0 +1,1 @@
+const s_url='https://-YOUR-URL-HERE!!-',s_key='-YOUR-API-KEY-HERE-',s_lang='fi';(function(d){const s = d.createElement('script');s.src=`${s_url}/js/sanuli-konuli.js?D=`+(new Date()).getTime();d.head.appendChild(s)})(document)
